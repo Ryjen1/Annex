@@ -36,12 +36,12 @@ export default function App() {
               Non-custodial · on-chain AMM · gas in BTC
             </span>
             <a
-              href="https://github.com/Ryjen1/Annex"
+              href="https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d"
               target="_blank"
               rel="noreferrer"
               className="transition-colors hover:text-white"
             >
-              GitHub
+              Mezo Testnet
             </a>
           </span>
         </div>
