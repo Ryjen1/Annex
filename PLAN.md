@@ -1,6 +1,8 @@
 # Annex — Build Plan & Status
 
-> **Last updated:** Session 2 (contracts tested + fixed, frontend built, awaiting testnet deploy)
+> **Last updated:** Session 3 — Wave 1 submission prep (public repo + Vercel deploy +
+> submission copy + video shot list done; contract deploy blocked on testnet funding).
+> **Wave 1 deadline: Oct 26, 2026, 16:00 UTC.**
 
 ## What is Annex?
 
@@ -117,30 +119,46 @@ create + portfolio pages render, no console errors.
 - `README.md` — overview, AMM explanation, run instructions, API, security notes
 - `docs/architecture.md` — AMM design, invariants, settlement maths, roles, limitations
 
+### 8. Wave 1 submission prep ✅ (session 3)
+- **Public repo** — https://github.com/Ryjen1/Annex (first commit `e320783`, pushed to `main`)
+- **Frontend deployed** — https://annex-markets.vercel.app (Vercel project `annex-markets`,
+  VITE_* env vars set there, `frontend/.vercelignore` keeps local `.env` out of the upload)
+- **Submission copy** — `docs/submission.md`: paste-ready answers for every AKINDO form field
+  (name, category, TL;DR, how it works, target group, stack, track, chain, status, readiness,
+  links, wave updates, milestones, team info) + checklist
+- **Video shot list** — `docs/demo-script.md`: 9-shot, 120 s recording plan with voiceover
+- **Deployer key** — generated at `~/.annex/deployer.key` (outside the repo),
+  address `0xac89fFA908D0bD7A9EE78DfAd4b40362d9971b15`; needs testnet BTC + MUSD from the user
+
 ---
 
 ## What's NOT Done Yet (priority order)
 
-### A. Deploy to Mezo testnet (HIGH — needs a funded key from the user)
+### A. Deploy to Mezo testnet (HIGH — waiting on funding)
+The deployer address `0xac89fFA908D0bD7A9EE78DfAd4b40362d9971b15` must be funded with testnet
+BTC (gas) and MUSD (liquidity + demo trading). Once funded:
 ```bash
-export PRIVATE_KEY=0x...      # testnet BTC from https://faucet.test.mezo.org/
+export PRIVATE_KEY=$(cat ~/.annex/deployer.key)
 export RPC_URL=https://rpc.test.mezo.org
 cd contracts
-forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast --verify
+forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 ANNEX_ADDRESS=0x... forge script script/SeedMarkets.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 ```
-Then set `VITE_ANNEX_ADDRESS` in `frontend/.env` and record both addresses in README.
+Then set `VITE_ANNEX_ADDRESS` in the Vercel project env (`vercel env add ... --force`),
+redeploy, and record the address in README + `docs/submission.md`.
 
 ### B. MUSD on testnet (HIGH — blocks any real trading demo)
 MUSD is a CDP stablecoin: faucet BTC → open a trove (Mezo app or BorrowerOperations
 `0xCdF7028ceAB81fA0C6971208e83fa7872996beE5`) → borrow MUSD.
 
-### C. Pitch deck (MEDIUM)
-`docs/pitch-deck.md` — 6–8 slides: problem, solution, how the AMM works, demo flow, traction
-plan, roadmap. No external project names.
+### C. Pitch deck ✅
+`docs/pitch-deck.md` — 8 slides: problem, solution, AMM mechanics, safety invariant, demo
+flow, what is built, roadmap. No external project names.
 
-### D. Demo video (MEDIUM)
-Under 3 minutes: connect wallet → create/buy YES → resolve → redeem.
+### D. Demo video (MEDIUM — script done, recording pending)
+`docs/demo-script.md` has the 120 s shot list. AKINDO asks for a **2-minute** pitch video:
+record after the testnet deployment so the contract address, seeded markets and a
+past-`endTime` market are on camera.
 
 ### E. Nice-to-have (only if time remains)
 - Transferable LP shares (secondary LP market) — currently creator-only.
