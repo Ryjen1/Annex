@@ -1,0 +1,180 @@
+# Annex — Build Plan & Status
+
+> **Last updated:** Session 2 (contracts tested + fixed, frontend built, awaiting testnet deploy)
+
+## What is Annex?
+
+Annex is a permissionless binary prediction market protocol on Mezo Testnet, settled in MUSD.
+Users create yes/no markets, trade YES/NO shares via an on-chain constant-product AMM, and
+redeem winning shares 1:1 for MUSD after resolution. Gas is paid in BTC (Mezo native).
+
+**Name clarification:** the product was renamed by the user. The name is **Annex** — use it
+everywhere: contract names, frontend, README, docs, pitch deck. The original PRD name must
+never appear in code, docs, README or commit messages.
+
+---
+
+## Mezo Testnet Reference (verified)
+
+| Parameter | Value |
+|-----------|-------|
+| Chain ID | `31611` (`0x7b7b`) |
+| RPC URL | `https://rpc.test.mezo.org` |
+| WSS URL | `wss://rpc-ws.test.mezo.org` |
+| Explorer | `https://explorer.test.mezo.org` |
+| Native currency | Bitcoin (BTC), 18 decimals |
+| **MUSD contract** | `0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503` |
+| Faucet (testnet BTC) | `https://faucet.test.mezo.org/` |
+| Wallet SDK | `@mezo-org/passport` (wraps RainbowKit + wagmi + viem) |
+| Solidity version | `0.8.28` (matches Mezo's own MUSD contracts) |
+| EVM version | `london` |
+
+**MUSD notes:** MUSD has 18 decimals. It's a CDP stablecoin — to get MUSD on testnet, you
+get testnet BTC from the faucet, then open a trove via the Mezo app or BorrowerOperations
+contract (`0xCdF7028ceAB81fA0C6971208e83fa7872996beE5`).
+
+---
+
+## Completed Work
+
+### 1. Project scaffold ✅
+- Git repo initialized at `/home/maryjane/Desktop/workspace/job/hack/Annex` (branch: `main`, **no commits yet**)
+- Foundry project in `contracts/` (forge-std installed)
+- `contracts/foundry.toml`: solc 0.8.28, london, optimizer 200 runs, via_ir, fuzz 256 runs
+
+### 2. Mezo research ✅
+- All details in the table above. MUSD address verified on-chain via eth_call.
+
+### 3. Smart contracts ✅ (`contracts/src/AnnexMarket.sol`, compiles clean)
+
+**AMM design (CORRECTED in session 2 — read `docs/architecture.md`):**
+- Constant-product pool over YES/NO share inventories, `k = reserveYes * reserveNo`.
+- A deposit of `a` MUSD is split into a complete set (`a` YES + `a` NO). The NO half is the
+  counter-collateral that makes the pool release YES; the buyer keeps the YES half plus the
+  pool's swap output → buyer receives `a + swapOut` YES shares.
+- `priceYes = reserveNo / (reserveYes + reserveNo)` is the true marginal cost of a share, so
+  the quoted price equals the price paid (plus slippage).
+- Solvency is exact: `totalCollateral == totalYes == totalNo`.
+
+**Key functions:**
+| Function | Purpose |
+|----------|---------|
+| `createMarket(question, description, category, endTime, initialLiquidity)` | Create + seed AMM, mint LP shares to creator |
+| `buyShares(marketId, outcome, musdAmount)` | Buy YES/NO via AMM |
+| `resolve(marketId, outcome)` | Resolver/owner sets outcome after endTime |
+| `redeem(marketId)` | Redeem winning shares 1:1 for MUSD |
+| `claimLp(marketId)` | LPs claim proportional AMM value after resolution |
+| `setResolver(marketId, resolver)` | Change resolver (creator or owner) |
+| `transferOwnership(newOwner)` | Protocol owner transfer |
+| `getYesPrice` / `getNoPrice` | Marginal prices (1e18 = 1.0 MUSD) |
+| `getBuyQuote(marketId, outcome, musdAmount)` | Preview shares out (incl. split half) |
+| `getMarketA` / `getMarketB` | Split views (avoid stack-too-deep) — frontend calls both |
+| `getUserPosition(marketId, user)` | User's YES/NO/LP shares |
+| `marketCount()` | Total markets created |
+
+### 4. Test suite ✅ (`contracts/test/AnnexMarket.t.sol` — 51 tests, all green)
+`forge test` covers: creation + reverts, buy YES/NO (reserves, prices, constant product),
+quote-vs-price consistency, execution price between pre/post trade price, "buyer is never
+systematically short", solvency + share-accounting invariants after every operation,
+resolution authorisation/timing/double-resolve, redeem (1:1, winning side only, zeroing),
+LP claim, full lifecycles (YES wins / NO wins / exact collateral payout), reentrancy guard
+(malicious token re-entering during `transferFrom`), and fuzz tests over random trade
+sequences.
+
+**Regression value:** reverting the AMM fix makes 4 tests fail (`test_Buy_QuoteMatchesQuotedPrice`,
+`test_Buy_ExecutionPriceLiesBetweenPreAndPostPrice`, `test_Buy_BuyerIsNeverSystematicallyShort`,
+`test_BuyYes_UpdatesReservesAndBalances`) — verified.
+
+### 5. Deploy + seed scripts ✅
+- `contracts/script/DeployAnnex.s.sol` — deploys MockMUSD off-Mezo, canonical MUSD on Mezo
+  Testnet (falls back to mock if the MUSD address has no code, e.g. local anvil).
+  Supports `PRIVATE_KEY` env or `--private-key` CLI.
+- `contracts/script/SeedMarkets.s.sol` — creates 5 demo markets (BTC price, Mezo, crypto).
+- Both verified end-to-end against a local anvil on chain id 31611.
+
+### 6. Frontend ✅ (`frontend/`, Vite + React 18 + TS + wagmi v2 + viem + Tailwind v4)
+- `src/lib/chains.ts` — Mezo Testnet chain (multicall3, explorer, `VITE_RPC_URL` override)
+- `src/lib/abi.ts` — ABI generated from the forge output
+- `src/lib/contracts.ts` — addresses + `Outcome` enum + categories
+- `src/lib/wagmi.ts` — wagmi config via `@mezo-org/passport` (Unisat/Xverse/OKX/WalletConnect)
+- `src/hooks/useMarkets.ts` — batched multicall reads for markets + user positions
+- `src/components/` — Header (wallet + MUSD balance), MarketCard + PriceBar, TradePanel
+  (approve → buy, live quote, average price, max payout)
+- `src/pages/` — Markets (list, filters, search, stats), MarketDetail (info, position,
+  redeem/claim/resolve), CreateMarket (form with approve + create), Portfolio
+- Dark Bitcoin-orange theme, responsive.
+
+**Build/runtime fixes needed for the wallet stack:**
+- `vite-plugin-node-polyfills` injects `Buffer`/`process`/`global` (Mezo wallet stack needs them).
+- `WalletConnect projectId` must be non-empty (placeholder `annex0000…` in `wagmi.ts`).
+- React 18 (not 19) — Passport's peer dependency.
+
+**Verified in a headless browser:** markets list renders live data (5 seeded markets, prices,
+pools, countdowns), market detail renders with a live quote (25 MUSD → 49.39 YES @ 50.62¢),
+create + portfolio pages render, no console errors.
+
+### 7. Docs ✅
+- `README.md` — overview, AMM explanation, run instructions, API, security notes
+- `docs/architecture.md` — AMM design, invariants, settlement maths, roles, limitations
+
+---
+
+## What's NOT Done Yet (priority order)
+
+### A. Deploy to Mezo testnet (HIGH — needs a funded key from the user)
+```bash
+export PRIVATE_KEY=0x...      # testnet BTC from https://faucet.test.mezo.org/
+export RPC_URL=https://rpc.test.mezo.org
+cd contracts
+forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast --verify
+ANNEX_ADDRESS=0x... forge script script/SeedMarkets.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
+```
+Then set `VITE_ANNEX_ADDRESS` in `frontend/.env` and record both addresses in README.
+
+### B. MUSD on testnet (HIGH — blocks any real trading demo)
+MUSD is a CDP stablecoin: faucet BTC → open a trove (Mezo app or BorrowerOperations
+`0xCdF7028ceAB81fA0C6971208e83fa7872996beE5`) → borrow MUSD.
+
+### C. Pitch deck (MEDIUM)
+`docs/pitch-deck.md` — 6–8 slides: problem, solution, how the AMM works, demo flow, traction
+plan, roadmap. No external project names.
+
+### D. Demo video (MEDIUM)
+Under 3 minutes: connect wallet → create/buy YES → resolve → redeem.
+
+### E. Nice-to-have (only if time remains)
+- Transferable LP shares (secondary LP market) — currently creator-only.
+- A market activity/history chart (price over time).
+- Health endpoint / event log page.
+
+---
+
+## Commands Reference
+
+```bash
+# Contracts
+cd contracts
+forge build                    # compile
+forge test -vvv                # run the 51 tests
+forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
+
+# Frontend
+cd frontend
+npm run dev                    # start dev server
+npm run build                  # production build
+
+# Local anvil (chain id 31611 to match Mezo)
+anvil --chain-id 31611
+```
+
+---
+
+## Critical Constraints (from PRD)
+
+- **The product name is "Annex"** — the original PRD name must never appear anywhere
+- Do NOT reference, link, credit, or mention any external prediction market project anywhere public
+- MUSD is the only accepted currency
+- All funds remain in smart contracts (non-custodial)
+- No complex oracle — admin/resolver resolution only
+- Wave 1 deadline: **Oct 26**
+- Gas paid in BTC (Mezo native)
