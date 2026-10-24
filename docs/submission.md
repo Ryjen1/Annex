@@ -100,8 +100,24 @@ token, with a live frontend and seeded demo markets.
 | Live app | https://annex-markets.vercel.app (landing) · https://annex-markets.vercel.app/markets (market list) |
 | Contract | `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` — https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d |
 | Public repo | https://github.com/Ryjen1/Annex |
-| Deck | [`docs/pitch-deck.md`](pitch-deck.md) (8 slides, in the repo) |
+| Deck | [`assets/deck.pdf`](../assets/deck.pdf) (8 slides, PDF) · source: [`assets/deck.html`](../assets/deck.html) |
 | Video | 2-minute pitch — `<YOUTUBE_LINK>` |
+
+### Brand + media assets
+
+| Asset | File | Live URL (after deploy) |
+|-------|------|--------------------------|
+| Banner (1600×900) | `assets/banner.png` · `assets/banner.svg` | https://annex-markets.vercel.app/assets/banner.png |
+| OG / social card (1200×630) | `assets/og-card.png` · `assets/og-card.svg` | https://annex-markets.vercel.app/assets/og-card.png |
+| Logo mark (512×512, transparent) | `assets/logo-mark.png` · `assets/logo-mark.svg` | https://annex-markets.vercel.app/assets/logo-mark.png |
+| Logo lockup (1440×400, transparent) | `assets/logo-lockup.png` · `assets/logo-lockup.svg` | https://annex-markets.vercel.app/assets/logo-lockup.png |
+| Deck (8 slides, PDF) | `assets/deck.pdf` | https://annex-markets.vercel.app/assets/deck.pdf |
+| Deck slide images | `assets/slides/slide-01…08.png` | — |
+| Product screenshots | `assets/screenshots/01-landing.png` … `06-mobile-landing.png` | — |
+
+Screenshot index: `01-landing` (hero), `02-markets` (market list), `03-market-detail`
+(market + trade panel), `04-market-live` (another market), `05-create-market`
+(create flow), `06-mobile-landing` (mobile).
 
 ## Updates in this Wave
 

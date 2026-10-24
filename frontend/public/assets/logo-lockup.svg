@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="720" height="200" role="img" aria-label="Annex — permissionless prediction markets on Mezo">
+  <defs>
+    <linearGradient id="lockupCoin" x1="18%" y1="8%" x2="82%" y2="96%">
+      <stop offset="0%" stop-color="#ffd9a0" />
+      <stop offset="42%" stop-color="#f7931a" />
+      <stop offset="100%" stop-color="#8a4c05" />
+    </linearGradient>
+    <linearGradient id="lockupBrand" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff8c00" />
+      <stop offset="45%" stop-color="#ffb454" />
+      <stop offset="100%" stop-color="#ffd9a0" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(20 20)">
+    <circle cx="80" cy="80" r="76" fill="url(#lockupCoin)" />
+    <circle cx="80" cy="80" r="76" fill="none" stroke="#ffd9a0" stroke-width="2.5" stroke-opacity="0.45" />
+    <circle cx="80" cy="80" r="65" fill="none" stroke="#6f3d02" stroke-width="1.6" stroke-opacity="0.35" />
+    <g fill="#120a01">
+      <text x="80" y="84" text-anchor="middle" dominant-baseline="central"
+        font-family="Outfit, Poppins, Arial, sans-serif" font-size="104" font-weight="700">₿</text>
+      <rect x="47" y="26" width="7" height="108" rx="3.5" />
+      <rect x="106" y="26" width="7" height="108" rx="3.5" />
+    </g>
+  </g>
+
+  <text x="212" y="92" font-family="Outfit, Poppins, Arial, sans-serif" font-size="86" font-weight="700"
+    letter-spacing="-3" fill="url(#lockupBrand)">Annex</text>
+  <text x="214" y="134" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="400"
+    fill="#8b8ba8">Permissionless prediction markets on Mezo</text>
+</svg>

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Annex — Mezo Buildathon deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @page { size: 1280px 720px; margin: 0; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { background: #030412; }
+      body {
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+      }
+      .slide {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        overflow: hidden;
+        background: #030412;
+        page-break-after: always;
+        break-after: page;
+      }
+      .slide:last-child { page-break-after: auto; break-after: auto; }
+      .grid {
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 10%, transparent 75%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 10%, transparent 75%);
+      }
+      .bloom {
+        position: absolute;
+        top: -220px; left: 50%;
+        width: 900px; height: 620px;
+        transform: translateX(-50%);
+        background: radial-gradient(circle, rgba(247,147,26,0.16), transparent 62%);
+        filter: blur(70px);
+      }
+      .inner { position: relative; z-index: 2; padding: 72px 80px; height: 100%; display: flex; flex-direction: column; }
+      .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; }
+      .brand svg { width: 40px; height: 40px; }
+      .brand span { font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -0.02em;
+        background-image: linear-gradient(100deg, #ff8c00, #ffb454 45%, #ffd9a0);
+        -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .eyebrow { font-size: 13px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: #8b8ba8; }
+      h1 { font-family: 'Outfit', sans-serif; font-size: 62px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; }
+      h2 { font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+      .grad { background-image: linear-gradient(100deg, #ff8c00, #ffb454 45%, #ffd9a0);
+        -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .lede { font-size: 20px; line-height: 1.55; color: rgba(255,255,255,0.55); max-width: 780px; }
+      .body { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.55); }
+      .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center;
+        font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(255,255,255,0.32); }
+      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 34px; }
+      .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px; }
+      .card { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 20px; padding: 26px 24px; }
+      .card h3 { font-family: 'Outfit', sans-serif; font-size: 21px; font-weight: 600; margin-bottom: 8px; }
+      .card p { font-size: 14.5px; line-height: 1.55; color: rgba(255,255,255,0.5); }
+      .num { font-family: 'Outfit', sans-serif; font-size: 34px; font-weight: 700; color: #f7931a; }
+      .label { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #7c7c96; }
+      ul { list-style: none; }
+      li { position: relative; padding-left: 26px; margin-bottom: 14px; font-size: 17px; line-height: 1.5; color: rgba(255,255,255,0.6); }
+      li::before { content: ''; position: absolute; left: 0; top: 9px; width: 8px; height: 8px; border-radius: 99px; background: #f7931a;
+        box-shadow: 0 0 10px rgba(247,147,26,0.8); }
+      li b { color: #fff; font-weight: 600; }
+      .code { font-family: 'JetBrains Mono', monospace; font-size: 15px; line-height: 1.7; color: #ffb454;
+        background: rgba(247,147,26,0.08); border: 1px solid rgba(247,147,26,0.25); border-radius: 16px; padding: 22px 24px; }
+      .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 30px; }
+      .stat { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); border-radius: 18px; padding: 20px; }
+      .stat .v { font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 700; margin-top: 6px; }
+      .pill { display: inline-block; padding: 6px 14px; border-radius: 99px; font-size: 12px; letter-spacing: 0.16em;
+        text-transform: uppercase; color: #ffb454; background: rgba(247,147,26,0.12); border: 1px solid rgba(247,147,26,0.35); }
+      table { width: 100%; border-collapse: collapse; margin-top: 26px; font-size: 16px; }
+      th { text-align: left; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #7c7c96;
+        font-weight: 600; padding-bottom: 12px; }
+      td { padding: 13px 0; border-top: 1px solid rgba(255,255,255,0.07); color: rgba(255,255,255,0.65); }
+      td.ok { color: #3ecf8e; font-weight: 600; }
+      .coin { position: absolute; right: 92px; top: 118px; width: 330px; height: 330px; z-index: 1; }
+    </style>
+  </head>
+  <body>
+    <!-- 1 · title -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <svg class="coin" viewBox="0 0 200 200">
+        <defs>
+          <radialGradient id="c1" cx="35%" cy="28%" r="78%">
+            <stop offset="0%" stop-color="#ffd9a0" /><stop offset="42%" stop-color="#f7931a" /><stop offset="100%" stop-color="#8a4c05" />
+          </radialGradient>
+          <radialGradient id="h1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f7931a" stop-opacity="0.5" /><stop offset="60%" stop-color="#f7931a" stop-opacity="0.1" /><stop offset="100%" stop-color="#f7931a" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="98" fill="url(#h1)" />
+        <circle cx="100" cy="100" r="62" fill="url(#c1)" />
+        <circle cx="100" cy="100" r="62" fill="none" stroke="#ffd9a0" stroke-opacity="0.5" stroke-width="1.4" />
+        <g fill="#120a01">
+          <text x="100" y="100" text-anchor="middle" dominant-baseline="central" font-family="Outfit, sans-serif" font-size="68" font-weight="700">₿</text>
+          <rect x="86" y="58" width="9" height="140" rx="4.5" /><rect x="161" y="58" width="9" height="140" rx="4.5" />
+        </g>
+      </svg>
+      <div class="inner">
+        <div class="brand">
+          <svg viewBox="0 0 256 256"><circle cx="128" cy="128" r="96" fill="#f7931a" /><circle cx="128" cy="128" r="96" fill="none" stroke="#ffd9a0" stroke-opacity="0.5" stroke-width="3" /><g fill="#120a01"><text x="128" y="134" text-anchor="middle" dominant-baseline="central" font-family="Outfit, sans-serif" font-size="132" font-weight="700">₿</text><rect x="86" y="58" width="9" height="140" rx="4.5" /><rect x="161" y="58" width="9" height="140" rx="4.5" /></g></svg>
+          <span>Annex</span>
+        </div>
+        <h1>Trade the outcome<br /><span class="grad">of anything.</span></h1>
+        <p class="lede" style="margin-top: 22px">
+          Permissionless binary prediction markets on Mezo. Anyone can create a yes/no market,
+          trade YES or NO against an on-chain constant-product AMM, and redeem winning shares
+          1:1 for MUSD.
+        </p>
+        <div style="margin-top: 26px; display: flex; gap: 10px;">
+          <span class="pill">Mezo Testnet · 31611</span>
+          <span class="pill">Settled in MUSD</span>
+          <span class="pill">Gas in BTC</span>
+          <span class="pill">Non-custodial</span>
+        </div>
+        <div class="foot"><span>annex-markets.vercel.app</span><span>github.com/Ryjen1/Annex</span></div>
+      </div>
+    </section>
+
+    <!-- 2 · problem -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">The problem</div>
+        <h2 style="margin-top: 14px;">People already bet on outcomes.<br /><span class="grad">The venues do not fit.</span></h2>
+        <div class="grid-2">
+          <div class="card"><h3>Offshore and custodial</h3><p>Funds sit with an operator, not in a contract you can verify.</p></div>
+          <div class="card"><h3>Hard to reach</h3><p>A Bitcoin-native user needs a separate chain, a bridge, and a stablecoin they do not hold.</p></div>
+          <div class="card"><h3>Opaque</h3><p>A proprietary order book and a private risk engine. You cannot check that a market is solvent.</p></div>
+          <div class="card"><h3>No Bitcoin rails</h3><p>Bitcoin has the money, the users and the finality — and no venue for collective opinion.</p></div>
+        </div>
+        <div class="foot"><span>Annex — Mezo Buildathon</span><span>02</span></div>
+      </div>
+    </section>
+
+    <!-- 3 · solution -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">The solution</div>
+        <h2 style="margin-top: 14px;">A prediction market protocol that runs<br /><span class="grad">natively on Mezo.</span></h2>
+        <ul style="margin-top: 30px;">
+          <li><b>Any wallet</b> can create a yes/no market in one transaction.</li>
+          <li>An <b>on-chain constant-product AMM</b> prices the two sides and settles every trade.</li>
+          <li>The winner redeems <b>1:1 for MUSD</b>, a Bitcoin-backed stablecoin.</li>
+          <li>Everything is verifiable on-chain: <b>no operator, no order book, no off-chain component</b>.</li>
+        </ul>
+        <div class="stat-row">
+          <div class="stat"><div class="label">Markets live</div><div class="v grad">7</div></div>
+          <div class="stat"><div class="label">Pool</div><div class="v">2.6K MUSD</div></div>
+          <div class="stat"><div class="label">Contract</div><div class="v">1</div></div>
+          <div class="stat"><div class="label">Tests</div><div class="v">51</div></div>
+        </div>
+        <div class="foot"><span>annex-markets.vercel.app</span><span>03</span></div>
+      </div>
+    </section>
+
+    <!-- 4 · AMM -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">How the AMM works</div>
+        <h2 style="margin-top: 14px;">The quote <span class="grad">is</span> the price you pay.</h2>
+        <div class="grid-2" style="grid-template-columns: 1.15fr 0.85fr;">
+          <div class="code">
+buy YES with a MUSD<br />
+&nbsp;&nbsp;└─► split a into a complete set: a YES + a NO<br />
+&nbsp;&nbsp;&nbsp;&nbsp;├─ the NO half becomes counter-collateral<br />
+&nbsp;&nbsp;&nbsp;&nbsp;└─ the pool releases YES (k preserved)<br /><br />
+buyer receives &nbsp;a + swapOut YES shares<br />
+priceYes = reserveNo / (reserveYes + reserveNo)
+          </div>
+          <div>
+            <ul style="margin-top: 4px;">
+              <li><b>Exact solvency</b> — every MUSD deposited mints exactly one YES and one NO.</li>
+              <li><b>Honest pricing</b> — the marginal cost is the quoted cost, plus ordinary slippage.</li>
+              <li><b>The spread is the business</b> — the liquidity provider earns it, openly.</li>
+            </ul>
+            <div class="card" style="margin-top: 18px;">
+              <div class="label">Live on market #0</div>
+              <div class="num" style="margin-top: 6px;">25 MUSD → 41.67 YES</div>
+              <p style="margin-top: 4px;">Average execution 60.00¢ · price impact 3.32%</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Annex — Mezo Buildathon</span><span>04</span></div>
+      </div>
+    </section>
+
+    <!-- 5 · safety -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">Why it is safe</div>
+        <h2 style="margin-top: 14px;">The invariant <span class="grad">is</span> the product.</h2>
+        <div class="code" style="margin-top: 28px; text-align: center; font-size: 21px; letter-spacing: 0.02em;">
+totalCollateral&nbsp;&nbsp;==&nbsp;&nbsp;totalYes&nbsp;&nbsp;==&nbsp;&nbsp;totalNo
+        </div>
+        <div class="grid-3">
+          <div class="card"><h3>No admin path</h3><p>No withdrawal function, no upgrade key, no admin pricing, no oracle.</p></div>
+          <div class="card"><h3>Permissioned resolution</h3><p>Only the market's resolver or the protocol owner can settle it.</p></div>
+          <div class="card"><h3>Proven by tests</h3><p>51 Foundry tests: unit, fuzz, reentrancy, full lifecycle, invariants.</p></div>
+        </div>
+        <p class="body" style="margin-top: 24px;">
+          You do not have to trust an operator's risk engine — you read it off the contract.
+        </p>
+        <div class="foot"><span>annex-markets.vercel.app</span><span>05</span></div>
+      </div>
+    </section>
+
+    <!-- 6 · demo -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">The demo — 90 seconds</div>
+        <h2 style="margin-top: 14px;">Connect. Trade. Resolve. <span class="grad">Redeem.</span></h2>
+        <div class="grid-2" style="grid-template-columns: repeat(2, 1fr); margin-top: 28px;">
+          <div class="card"><div class="num">01</div><h3 style="margin-top: 6px;">Connect</h3><p>A Bitcoin wallet (Unisat, Xverse, OKX) or any injected EVM wallet.</p></div>
+          <div class="card"><div class="num">02</div><h3 style="margin-top: 6px;">Create</h3><p>Question, resolution criteria, close date, 1,000 MUSD of liquidity. You become the LP.</p></div>
+          <div class="card"><div class="num">03</div><h3 style="margin-top: 6px;">Trade</h3><p>Buy 25 MUSD of YES at a live quote. The pool price moves immediately.</p></div>
+          <div class="card"><div class="num">04</div><h3 style="margin-top: 6px;">Settle</h3><p>The resolver posts the outcome; winning shares redeem 1:1 in MUSD.</p></div>
+        </div>
+        <p class="body" style="margin-top: 22px;">No registration, no deposit address, no support ticket.</p>
+        <div class="foot"><span>annex-markets.vercel.app</span><span>06</span></div>
+      </div>
+    </section>
+
+    <!-- 7 · built -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">What is built today</div>
+        <h2 style="margin-top: 14px;">Shipped on <span class="grad">Mezo Testnet.</span></h2>
+        <table>
+          <thead><tr><th>Piece</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Core contract (create / trade / resolve / redeem / LP claim)</td><td class="ok">done — live on testnet</td></tr>
+            <tr><td>AMM with exact solvency and honest marginal pricing</td><td class="ok">done — 51 tests green</td></tr>
+            <tr><td>Frontend: landing, markets, detail, live price curve, create, portfolio</td><td class="ok">done — live</td></tr>
+            <tr><td>Deploy + seed scripts, public repo, docs, deck</td><td class="ok">done</td></tr>
+          </tbody>
+        </table>
+        <div class="stat-row">
+          <div class="stat"><div class="label">Contract</div><div class="v" style="font-size: 15px; font-family: 'JetBrains Mono', monospace;">0xfdbfde0a…5a501d</div></div>
+          <div class="stat"><div class="label">Chain</div><div class="v">31611</div></div>
+          <div class="stat"><div class="label">Settlement</div><div class="v">MUSD</div></div>
+          <div class="stat"><div class="label">Gas</div><div class="v">BTC</div></div>
+        </div>
+        <div class="foot"><span>github.com/Ryjen1/Annex</span><span>07</span></div>
+      </div>
+    </section>
+
+    <!-- 8 · roadmap -->
+    <section class="slide">
+      <div class="grid"></div><div class="bloom"></div>
+      <div class="inner">
+        <div class="brand"><span>Annex</span></div>
+        <div class="eyebrow">Roadmap</div>
+        <h2 style="margin-top: 14px;">Bitcoin-native markets for<br /><span class="grad">every measurable claim.</span></h2>
+        <div class="grid-3">
+          <div class="card"><div class="label">Wave 1</div><h3 style="margin-top: 6px;">More liquidity</h3><p>Transferable LP shares so anyone can provide liquidity, plus a price-history chart per market.</p></div>
+          <div class="card"><div class="label">Wave 2</div><h3 style="margin-top: 6px;">More outcomes</h3><p>Multi-outcome markets beyond yes/no, and optional oracle resolution a creator can point at.</p></div>
+          <div class="card"><div class="label">Beyond</div><h3 style="margin-top: 6px">Settlement that asks nobody</h3><p>A venue for collective opinion on Bitcoin rails, with settlement you can read off the bytecode.</p></div>
+        </div>
+        <div style="margin-top: 34px; display: flex; align-items: center; gap: 18px;">
+          <div>
+            <div class="label">Try it</div>
+            <div style="font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 700; margin-top: 4px;">annex-markets.vercel.app</div>
+          </div>
+          <div style="width: 1px; height: 48px; background: rgba(255,255,255,0.12);"></div>
+          <div>
+            <div class="label">Contract</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 15px; margin-top: 10px; color: rgba(255,255,255,0.6);">0xfdbfde0a430de94c1d862cfc290c36549b5a501d</div>
+          </div>
+        </div>
+        <div class="foot"><span>Annex — permissionless prediction markets on Mezo, settled in MUSD</span><span>08</span></div>
+      </div>
+    </section>
+  </body>
+</html>

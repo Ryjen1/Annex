@@ -1,4 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#f7931a"/>
-  <path d="M9 23 16 8l7 15h-3.6l-1.3-3h-4.2l-1.3 3H9Zm6-5.9h2L15.5 14 15 17.1Z" fill="#0a0a0a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Annex">
+  <defs>
+    <linearGradient id="annexCoin" x1="18%" y1="8%" x2="82%" y2="96%">
+      <stop offset="0%" stop-color="#ffd9a0" />
+      <stop offset="42%" stop-color="#f7931a" />
+      <stop offset="100%" stop-color="#8a4c05" />
+    </linearGradient>
+    <linearGradient id="annexRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffb454" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#f7931a" stop-opacity="0.25" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="128" cy="128" r="122" fill="none" stroke="url(#annexRing)" stroke-width="3" stroke-opacity="0.55" />
+  <circle cx="128" cy="128" r="96" fill="url(#annexCoin)" />
+  <circle cx="128" cy="128" r="96" fill="none" stroke="#ffd9a0" stroke-width="3" stroke-opacity="0.45" />
+  <circle cx="128" cy="128" r="83" fill="none" stroke="#6f3d02" stroke-width="2" stroke-opacity="0.35" />
+
+  <g fill="#120a01">
+    <text x="128" y="134" text-anchor="middle" dominant-baseline="central"
+      font-family="Outfit, Poppins, Arial, sans-serif" font-size="132" font-weight="700">₿</text>
+    <rect x="86" y="58" width="9" height="140" rx="4.5" />
+    <rect x="161" y="58" width="9" height="140" rx="4.5" />
+  </g>
 </svg>
