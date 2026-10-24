@@ -143,6 +143,19 @@ create + portfolio pages render, no console errors.
 - **Frontend repointed** at the deployed contract and redeployed; markets list, market
   detail, create and portfolio pages verified in headless Chrome against live testnet data
 
+### 10. Frontend redesign ✅ (session 3)
+- **Design system** — `frontend/src/index.css`: glass surfaces, gradient brand text, glow
+  utilities, shimmer skeletons, ambient orange bloom backdrop, Space Grotesk + Inter pairing
+- **Pages** — floating pill nav, hero + stat strip on markets, glass market cards with hover
+  lift, restyled market detail / trade panel / create / portfolio
+- **Live AMM price curve** (`components/PriceCurve.tsx`, `hooks/usePriceCurve.ts`) — 21 points
+  read from the contract's own `getBuyQuote` in one multicall, plus price-impact and
+  average-price derived from those quotes. Verified against a fork of Mezo Testnet:
+  post-trade reserves match on-chain exactly (5/5 markets), price quote matches
+  `getBuyQuote` (41.67 YES for 25 MUSD on market 0).
+- **Wallet cleanup** — removed the placeholder WalletConnect connector (invalid project id
+  caused rejected relay requests in the console); Bitcoin + injected EVM wallets remain
+
 ---
 
 ## What's NOT Done Yet (priority order)
