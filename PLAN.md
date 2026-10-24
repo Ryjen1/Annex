@@ -172,6 +172,14 @@ create + portfolio pages render, no console errors.
   logo-lockup.png, deck.pdf}`. Favicon + OG/Twitter meta tags point at the new brand.
 - Asset index with file paths and live URLs is in `docs/submission.md`.
 
+### 12. Pitch video ✅ (session 3)
+- **`assets/video/annex-pitch.mp4`** — 78 s, 1920×1080 H.264, narrated (neural TTS), captions
+  burned in. Real screen recording of the live app: landing hero → how it works → market
+  list → **create a market on chain** → **buy YES with MUSD** → portfolio → end card. The
+  create and buy are real testnet transactions.
+- Served at `https://annex-markets.vercel.app/assets/annex-pitch.mp4`; upload to YouTube
+  (unlisted) for the submission and swap the link in `docs/submission.md`.
+
 ---
 
 ## What's NOT Done Yet (priority order)
