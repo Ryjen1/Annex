@@ -9,14 +9,15 @@ import { formatMusd, shortAddress } from '../lib/format'
 import { BitcoinIcon } from './icons'
 
 const NAV = [
-  { to: '/', label: 'Markets', end: true },
+  { to: '/', label: 'Home', end: true },
+  { to: '/markets', label: 'Markets' },
   { to: '/create', label: 'Create' },
   { to: '/portfolio', label: 'Portfolio' },
 ]
 
 function navClass({ isActive }: { isActive: boolean }) {
-  return `relative rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-200 sm:px-4 sm:py-2 sm:text-sm ${
-    isActive ? 'text-annex-orange' : 'text-annex-muted hover:text-annex-ink'
+  return `text-sm font-medium whitespace-nowrap transition-colors duration-200 ${
+    isActive ? 'text-annex-orange' : 'text-white/55 hover:text-white'
   }`
 }
 
@@ -32,42 +33,33 @@ export function Header() {
   })
 
   return (
-    <header className="sticky top-0 z-40 px-3 pt-3 sm:px-5 sm:pt-4">
-      <div className="glass mx-auto flex max-w-6xl items-center gap-2 rounded-full px-2.5 py-2 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] sm:gap-3 sm:px-4">
-        <Link to="/" className="group flex shrink-0 items-center gap-2.5">
-          <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-annex-orange-soft to-annex-orange-deep text-black shadow-[0_8px_24px_-10px_rgba(247,147,26,0.9)]">
-            <BitcoinIcon className="h-5 w-5" />
+    <nav className="fixed top-4 left-1/2 z-50 w-[95%] max-w-7xl -translate-x-1/2 overflow-hidden rounded-full border border-white/10 bg-black/25 shadow-lg backdrop-blur-xl transition-all duration-300 md:top-6">
+      <div className="relative z-10 flex w-full items-center justify-between px-4 py-3 lg:px-8">
+        <Link to="/" className="group flex shrink-0 items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-annex-orange-soft to-annex-orange-deep text-black shadow-[0_0_20px_-4px_rgba(255,140,0,0.8)]">
+            <BitcoinIcon className="h-4 w-4" />
           </span>
-          <span className="font-display hidden text-[17px] font-semibold tracking-tight sm:block">
-            <span className="text-gradient">Annex</span>
+          <span className="font-display text-xl font-bold tracking-[-0.02em] text-gradient-brand">
+            Annex
           </span>
         </Link>
 
-        <nav className="ml-1 flex items-center gap-0.5 sm:ml-2 sm:gap-1">
+        <div className="hidden items-center gap-6 lg:flex">
           {NAV.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
-              {({ isActive }) => (
-                <>
-                  {item.label}
-                  {isActive && (
-                    <span className="absolute inset-x-3 -bottom-px h-px bg-gradient-to-r from-transparent via-annex-orange to-transparent sm:inset-x-4" />
-                  )}
-                </>
-              )}
+              {item.label}
             </NavLink>
           ))}
-        </nav>
+        </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {isConnected && (
-            <div className="hidden items-center gap-2 rounded-full border border-white/8 bg-white/4 py-1.5 pl-3 pr-4 lg:flex">
+            <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-black/30 py-1.5 pr-4 pl-3.5 md:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-annex-green shadow-[0_0_8px_rgba(62,207,142,0.8)]" />
-              <span className="text-[11px] font-medium uppercase tracking-widest text-annex-muted">
+              <span className="text-[10px] font-medium tracking-[0.16em] text-white/45 uppercase">
                 MUSD
               </span>
-              <span className="font-mono text-sm font-medium tabular-nums">
-                {formatMusd(musdBalance)}
-              </span>
+              <span className="font-mono text-sm tabular-nums">{formatMusd(musdBalance)}</span>
             </div>
           )}
 
@@ -77,9 +69,9 @@ export function Header() {
                 return (
                   <button
                     onClick={openConnectModal}
-                    className="btn-primary btn-primary-hover whitespace-nowrap px-3.5 py-2 text-[13px] sm:text-sm"
+                    className="rounded-full border border-white/12 bg-black px-5 py-2.5 text-sm font-medium text-white shadow-[0_0_40px_rgba(255,140,0,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-annex-orange/50"
                   >
-                    Connect
+                    Connect wallet
                   </button>
                 )
               }
@@ -87,13 +79,13 @@ export function Header() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={openAccountModal}
-                    className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1.5 pl-3 pr-4 text-sm font-medium transition-colors hover:border-annex-orange/50"
+                    className="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 py-1.5 pr-4 pl-3.5 text-sm font-medium transition-colors hover:border-annex-orange/50"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-annex-green shadow-[0_0_8px_rgba(62,207,142,0.8)]" />
                     {account.displayName ?? shortAddress(account.address)}
                   </button>
                   {chain && !chain.unsupported && (
-                    <span className="hidden text-xs text-annex-muted xl:inline">{chain.name}</span>
+                    <span className="hidden text-xs text-white/40 xl:inline">{chain.name}</span>
                   )}
                 </div>
               )
@@ -101,6 +93,6 @@ export function Header() {
           </ConnectButton.Custom>
         </div>
       </div>
-    </header>
+    </nav>
   )
 }

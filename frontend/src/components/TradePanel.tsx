@@ -110,16 +110,16 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
 
   return (
     <div className="glass overflow-hidden rounded-4xl">
-      <div className="flex items-center justify-between border-b border-white/6 px-5 py-4">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-annex-muted">
+      <div className="flex items-center justify-between border-b border-white/6 px-6 py-4">
+        <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-white/45">
           Trade
         </h2>
-        <span className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-annex-muted">
+        <span className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-white/45">
           MUSD
         </span>
       </div>
 
-      <div className="space-y-5 p-5">
+      <div className="space-y-5 p-6">
         <div className="grid grid-cols-2 gap-2.5">
           <SideButton
             active={side === OUTCOME.Yes}
@@ -144,7 +144,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
             <label className="label-caps" htmlFor="amount">
               Amount
             </label>
-            <span className="font-mono text-[11px] text-annex-muted">
+            <span className="font-mono text-[11px] text-white/45">
               Balance {formatMusd(market.collateral, 0)} MUSD in pool
             </span>
           </div>
@@ -160,7 +160,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
               className="input-field focus:input-field-focus pr-16 font-mono tabular-nums disabled:opacity-50"
               placeholder="0.0"
             />
-            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-annex-muted">
+            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-white/45">
               MUSD
             </span>
           </div>
@@ -172,7 +172,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
                 type="button"
                 onClick={() => setAmount(value)}
                 disabled={closed}
-                className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[11px] text-annex-muted transition-colors hover:border-annex-orange/40 hover:text-annex-ink disabled:opacity-40"
+                className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[11px] text-white/45 transition-colors hover:border-annex-orange/40 hover:text-annex-ink disabled:opacity-40"
               >
                 {value}
               </button>
@@ -221,7 +221,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
 
         {message && (
           <div
-            className={`flex items-start gap-2 rounded-xl border px-3 py-2.5 text-xs ${
+            className={`flex items-start gap-2 rounded-2xl border px-3 py-2.5 text-xs ${
               message.tone === 'ok'
                 ? 'border-annex-green/35 bg-annex-green/10 text-annex-green'
                 : 'border-annex-red/35 bg-annex-red/10 text-annex-red'
@@ -235,7 +235,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
         <button
           onClick={handleBuy}
           disabled={!isConnected || closed || parsed <= 0n || busy}
-          className="btn-primary btn-primary-hover w-full px-4 py-3 text-sm"
+          className="btn-primary btn-primary-hover w-full px-6 py-3.5 text-[15px]"
         >
           {!isConnected
             ? 'Connect wallet to trade'
@@ -249,7 +249,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
         </button>
 
         {needsApproval && parsed > 0n && isConnected && !closed && (
-          <p className="text-center text-[11px] text-annex-muted">
+          <p className="text-center text-[11px] text-white/45">
             First transaction approves MUSD for the Annex contract.
           </p>
         )}
@@ -306,7 +306,7 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-annex-muted">{label}</dt>
+      <dt className="text-white/45">{label}</dt>
       <dd
         className={`font-mono tabular-nums ${
           highlight ? 'font-semibold text-annex-orange-soft' : 'text-annex-ink'

@@ -80,16 +80,16 @@ export function CreateMarket() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl pb-16">
-      <div className="animate-fade-up pt-10 sm:pt-14">
+    <div className="shell mx-auto max-w-3xl pb-24 pt-28 md:pt-40">
+      <div className="animate-fade-up">
         <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-annex-orange/25 bg-annex-orange/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-annex-orange-soft">
           <PlusIcon className="h-3 w-3" />
           Permissionless
         </span>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-annex-ink sm:text-4xl">
+        <h1 className="font-display text-4xl font-bold tracking-[-0.035em] text-white sm:text-5xl">
           Create a <span className="text-gradient">market</span>
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-annex-muted sm:text-base">
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/45 sm:text-base">
           Anyone can create a market. You seed the pool with MUSD and become the initial liquidity
           provider — you earn the spread when traders take the other side.
         </p>
@@ -139,7 +139,7 @@ export function CreateMarket() {
                 className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200 ${
                   category === item
                     ? 'bg-annex-orange text-black shadow-[0_10px_26px_-12px_rgba(247,147,26,0.9)]'
-                    : 'border border-white/8 bg-white/4 text-annex-muted hover:border-white/15 hover:text-annex-ink'
+                    : 'border border-white/8 bg-white/4 text-white/45 hover:border-white/15 hover:text-annex-ink'
                 }`}
               >
                 {item}
@@ -187,7 +187,7 @@ export function CreateMarket() {
         </div>
 
         {status && (
-          <div className="rounded-xl border border-annex-red/40 bg-annex-red/10 px-3 py-2.5 text-xs text-annex-red">
+          <div className="rounded-2xl border border-annex-red/40 bg-annex-red/10 px-3 py-2.5 text-xs text-annex-red">
             {status}
           </div>
         )}

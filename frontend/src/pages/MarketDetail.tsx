@@ -46,7 +46,7 @@ export function MarketDetail() {
 
   if (!market) {
     return (
-      <div className="glass rounded-4xl p-12 text-center text-sm text-annex-muted">
+      <div className="glass rounded-4xl p-12 text-center text-sm text-white/45">
         Market not found.{' '}
         <Link to="/" className="text-annex-orange underline">
           Back to markets
@@ -103,11 +103,11 @@ export function MarketDetail() {
   const winningShares = market.outcome === OUTCOME.Yes ? yesShares : noShares
 
   return (
-    <div className="grid gap-6 pb-16 lg:grid-cols-[1fr_380px]">
+    <div className="shell grid gap-6 pb-24 pt-28 md:pt-40 lg:grid-cols-[1fr_400px]">
       <div className="space-y-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-sm text-annex-muted transition-colors hover:text-annex-ink"
+          className="inline-flex items-center gap-2 text-sm text-white/45 transition-colors hover:text-annex-ink"
         >
           <ArrowLeft className="h-4 w-4" />
           All markets
@@ -115,7 +115,7 @@ export function MarketDetail() {
 
         <div className="glass animate-fade-up rounded-4xl p-6 sm:p-8">
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-annex-muted">
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
               {market.category || 'General'}
             </span>
             {market.resolved ? (
@@ -130,11 +130,11 @@ export function MarketDetail() {
             )}
           </div>
 
-          <h1 className="font-display text-2xl font-semibold leading-snug text-annex-ink sm:text-3xl">
+          <h1 className="font-display text-3xl leading-[1.08] font-bold tracking-[-0.03em] text-white sm:text-4xl">
             {market.question}
           </h1>
           {market.description && (
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-annex-muted">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/45">
               {market.description}
             </p>
           )}
@@ -181,7 +181,7 @@ export function MarketDetail() {
           </dl>
 
           {status && (
-            <div className="mt-6 rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3 text-xs text-annex-muted">
+            <div className="mt-6 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-xs text-white/45">
               {status === 'pending'
                 ? 'Waiting for confirmation…'
                 : status === 'resolved'
@@ -195,10 +195,10 @@ export function MarketDetail() {
 
         <div className="glass animate-fade-up rounded-4xl p-6 [animation-delay:80ms] sm:p-8">
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-annex-muted">
+            <h2 className="font-display text-sm font-semibold tracking-[0.16em] text-white/45 uppercase">
               Your position
             </h2>
-            <span className="flex items-center gap-1.5 text-[11px] text-annex-muted">
+            <span className="flex items-center gap-1.5 text-[11px] text-white/45">
               <ShieldIcon className="h-3.5 w-3.5 text-annex-orange" />
               On-chain
             </span>
@@ -224,7 +224,7 @@ export function MarketDetail() {
               <button
                 onClick={() => run('claim')}
                 disabled={status === 'pending'}
-                className="rounded-xl border border-annex-orange/50 px-4 py-2.5 text-sm font-semibold text-annex-orange transition-colors hover:bg-annex-orange/10 disabled:opacity-50"
+                className="rounded-full border border-annex-orange/50 px-5 py-2.5 text-sm font-semibold text-annex-orange transition-colors hover:bg-annex-orange/10 disabled:opacity-50"
               >
                 Claim LP
               </button>
@@ -234,14 +234,14 @@ export function MarketDetail() {
                 <button
                   onClick={() => run('resolve', OUTCOME.Yes)}
                   disabled={status === 'pending'}
-                  className="rounded-xl border border-annex-green/50 px-4 py-2.5 text-sm font-semibold text-annex-green transition-colors hover:bg-annex-green/10 disabled:opacity-50"
+                  className="rounded-full border border-annex-green/50 px-5 py-2.5 text-sm font-semibold text-annex-green transition-colors hover:bg-annex-green/10 disabled:opacity-50"
                 >
                   Resolve YES
                 </button>
                 <button
                   onClick={() => run('resolve', OUTCOME.No)}
                   disabled={status === 'pending'}
-                  className="rounded-xl border border-annex-red/50 px-4 py-2.5 text-sm font-semibold text-annex-red transition-colors hover:bg-annex-red/10 disabled:opacity-50"
+                  className="rounded-full border border-annex-red/50 px-5 py-2.5 text-sm font-semibold text-annex-red transition-colors hover:bg-annex-red/10 disabled:opacity-50"
                 >
                   Resolve NO
                 </button>
@@ -277,7 +277,7 @@ function Detail({
           : 'text-annex-ink'
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.025] px-3.5 py-3">
+    <div className="rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3.5">
       <dt className="label-caps">{label}</dt>
       <dd className={`mt-1 font-mono text-sm font-medium tabular-nums ${toneClass}`}>{value}</dd>
     </div>
@@ -301,7 +301,7 @@ function Pos({
         : 'text-annex-orange'
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.025] px-3.5 py-3">
+    <div className="rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3.5">
       <span className="label-caps">{label}</span>
       <div className={`mt-1 font-mono text-base font-semibold tabular-nums ${toneClass}`}>{value}</div>
     </div>

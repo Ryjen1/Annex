@@ -84,18 +84,18 @@ export function Portfolio() {
     return (
       <div className="glass mt-10 rounded-4xl p-12 text-center">
         <h1 className="font-display mb-2 text-2xl font-semibold">Portfolio</h1>
-        <p className="text-sm text-annex-muted">Connect your wallet to see your positions.</p>
+        <p className="text-sm text-white/45">Connect your wallet to see your positions.</p>
       </div>
     )
   }
 
   return (
-    <div className="pb-16">
-      <div className="animate-fade-up pt-10 sm:pt-14">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-annex-ink sm:text-4xl">
+    <div className="shell pb-24 pt-28 md:pt-40">
+      <div className="animate-fade-up">
+        <h1 className="font-display text-4xl font-bold tracking-[-0.035em] text-white sm:text-5xl">
           Your <span className="text-gradient">portfolio</span>
         </h1>
-        <p className="mt-2 text-sm text-annex-muted">
+        <p className="mt-2 text-sm text-white/45">
           Positions read straight from the contract. Redeem winning shares for MUSD at any time.
         </p>
       </div>
@@ -107,13 +107,13 @@ export function Portfolio() {
       </div>
 
       {error && (
-        <div className="mt-5 rounded-xl border border-annex-red/40 bg-annex-red/10 px-3 py-2.5 text-xs text-annex-red">
+        <div className="mt-5 rounded-2xl border border-annex-red/40 bg-annex-red/10 px-3 py-2.5 text-xs text-annex-red">
           {error}
         </div>
       )}
 
       {rows.length === 0 ? (
-        <div className="glass mt-6 rounded-4xl p-12 text-center text-sm text-annex-muted">
+        <div className="glass mt-6 rounded-4xl p-12 text-center text-sm text-white/45">
           No positions yet.{' '}
           <Link to="/" className="text-annex-orange underline">
             Browse markets
@@ -160,14 +160,14 @@ export function Portfolio() {
                           <button
                             onClick={() => run(market.id, 'claim')}
                             disabled={busy !== null}
-                            className="rounded-xl border border-annex-orange/50 px-4 py-2.5 text-sm font-semibold text-annex-orange transition-colors hover:bg-annex-orange/10 disabled:opacity-50"
+                            className="rounded-full border border-annex-orange/50 px-5 py-2.5 text-sm font-semibold text-annex-orange transition-colors hover:bg-annex-orange/10 disabled:opacity-50"
                           >
                             {busy === `${market.id}-claim` ? 'Claiming…' : 'Claim LP'}
                           </button>
                         )}
                       </>
                     ) : (
-                      <span className="rounded-full border border-white/8 bg-white/4 px-3 py-1.5 text-[11px] uppercase tracking-widest text-annex-muted">
+                      <span className="rounded-full border border-white/8 bg-white/4 px-3 py-1.5 text-[11px] uppercase tracking-widest text-white/45">
                         Open position
                       </span>
                     )}
@@ -192,10 +192,10 @@ function Stat({
   accent?: boolean
 }) {
   return (
-    <div className="glass rounded-2xl px-4 py-4">
+    <div className="glass rounded-3xl px-5 py-5">
       <span className="label-caps">{label}</span>
       <div
-        className={`font-display mt-1.5 text-2xl font-semibold tabular-nums ${
+        className={`font-display mt-2 text-3xl font-bold tabular-nums ${
           accent ? 'text-gradient' : 'text-annex-ink'
         }`}
       >

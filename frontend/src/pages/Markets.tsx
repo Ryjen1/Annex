@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 
 import { MarketCard } from '../components/MarketCard'
-import { PlusIcon, SearchIcon } from '../components/icons'
+import { SearchIcon } from '../components/icons'
 import { useMarkets } from '../hooks/useMarkets'
 import { useNow } from '../hooks/useNow'
-import { isDeployed } from '../lib/contracts'
 
 const FILTERS = ['All', 'BTC Price', 'Mezo', 'Crypto', 'Other']
 
@@ -30,70 +28,38 @@ export function Markets() {
   const resolvedCount = markets.filter((m) => m.resolved).length
 
   return (
-    <div className="pb-16">
-      <section className="animate-fade-up relative pt-10 pb-10 sm:pt-16 sm:pb-14">
-        <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(247,147,26,0.14),transparent_68%)] blur-3xl" />
-
-        <div className="relative max-w-3xl">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-annex-orange/25 bg-annex-orange/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-annex-orange-soft">
-            <span className="animate-pulse-ring h-1.5 w-1.5 rounded-full bg-annex-orange" />
-            Live on Mezo Testnet
-          </span>
-
-          <h1 className="font-display text-4xl font-bold leading-[1.02] tracking-tight text-annex-ink sm:text-6xl">
+    <div className="shell pb-24 pt-32 md:pt-40">
+      <div className="flex flex-wrap items-end justify-between gap-8">
+        <div className="max-w-2xl">
+          <span className="label-caps">Markets</span>
+          <h1 className="font-display mt-4 text-4xl leading-[1.02] font-bold tracking-[-0.035em] text-white sm:text-6xl">
             Trade the outcome
-            <span className="text-gradient"> of anything</span>
+            <span className="text-gradient-brand"> of anything</span>
           </h1>
-
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-annex-muted sm:text-lg">
-            Permissionless binary prediction markets. Create a question, take YES or NO against
-            an on-chain AMM, settle 1:1 in MUSD. No custody, no operator, no order book.
+          <p className="mt-5 text-lg leading-relaxed text-white/50">
+            Every market is a pool of YES and NO shares priced by an on-chain constant-product
+            AMM. Settlement is 1:1 in MUSD, straight from the contract.
           </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              to="/create"
-              className="btn-primary btn-primary-hover inline-flex items-center gap-2 px-5 py-3 text-sm"
-            >
-              <PlusIcon className="h-4 w-4" />
-              Create a market
-            </Link>
-            <a
-              href="https://github.com/Ryjen1/Annex"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-[0.875rem] border border-white/10 bg-white/4 px-5 py-3 text-sm font-medium text-annex-ink transition-colors hover:border-annex-orange/40 hover:text-white"
-            >
-              Read the docs
-            </a>
-          </div>
         </div>
-      </section>
+      </div>
 
-      <div className="animate-fade-up grid grid-cols-2 gap-3 sm:grid-cols-4 [animation-delay:80ms]">
+      <div className="animate-fade-up mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Stat label="Markets" value={String(markets.length)} hint="created" />
         <Stat label="Live now" value={String(liveCount)} hint="open for trading" accent />
         <Stat label="Total pool" value={`${formatCompact(totalPool)}`} hint="MUSD committed" />
         <Stat label="Resolved" value={String(resolvedCount)} hint="settled in MUSD" />
       </div>
 
-      {!isDeployed && (
-        <div className="mt-6 rounded-2xl border border-annex-orange/40 bg-annex-orange/10 px-4 py-3 text-sm text-annex-orange">
-          No contract address configured. Set <code className="font-mono">VITE_ANNEX_ADDRESS</code>{' '}
-          in <code className="font-mono">frontend/.env</code> and restart the dev server.
-        </div>
-      )}
-
-      <div className="mt-10 flex flex-wrap items-center gap-3">
-        <div className="flex flex-wrap gap-1.5">
+      <div className="mt-12 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap gap-2">
           {FILTERS.map((item) => (
             <button
               key={item}
               onClick={() => setFilter(item)}
-              className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200 ${
+              className={`rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-200 ${
                 filter === item
-                  ? 'bg-annex-orange text-black shadow-[0_10px_26px_-12px_rgba(247,147,26,0.9)]'
-                  : 'border border-white/8 bg-white/4 text-annex-muted hover:border-white/15 hover:text-annex-ink'
+                  ? 'bg-annex-orange text-black shadow-[0_0_30px_-6px_rgba(247,147,26,0.9)]'
+                  : 'border border-white/8 bg-white/4 text-white/50 hover:border-white/15 hover:text-white'
               }`}
             >
               {item}
@@ -101,28 +67,28 @@ export function Markets() {
           ))}
         </div>
 
-        <div className="relative ml-auto w-full sm:w-64">
-          <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-annex-muted" />
+        <div className="relative ml-auto w-full sm:w-72">
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search markets…"
-            className="input-field focus:input-field-focus pl-10"
+            className="input-field focus:input-field-focus pl-11"
           />
         </div>
       </div>
 
       {isLoading && (
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
           {[0, 1, 2, 3].map((key) => (
-            <div key={key} className="shimmer-skeleton h-64 rounded-4xl border border-white/6" />
+            <div key={key} className="shimmer-skeleton h-80 rounded-4xl border border-white/6" />
           ))}
         </div>
       )}
 
       {!isLoading && visible.length === 0 && (
-        <div className="panel mt-6 p-12 text-center">
-          <p className="text-sm text-annex-muted">
+        <div className="panel mt-8 p-16 text-center">
+          <p className="text-sm text-white/45">
             {markets.length === 0
               ? 'No markets yet. Create the first one.'
               : 'No markets match your filters.'}
@@ -130,7 +96,7 @@ export function Markets() {
         </div>
       )}
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
         {visible.map((market) => (
           <MarketCard key={market.id} market={market} now={now} />
         ))}
@@ -151,16 +117,16 @@ function Stat({
   accent?: boolean
 }) {
   return (
-    <div className="glass rounded-2xl px-4 py-4">
+    <div className="glass rounded-3xl px-5 py-5">
       <span className="label-caps">{label}</span>
       <div
-        className={`mt-1.5 font-display text-2xl font-semibold tabular-nums sm:text-3xl ${
-          accent ? 'text-gradient' : 'text-annex-ink'
+        className={`font-display mt-2 text-3xl font-bold tracking-[-0.02em] tabular-nums ${
+          accent ? 'text-gradient-brand' : 'text-white'
         }`}
       >
         {value}
       </div>
-      <div className="mt-0.5 text-[11px] text-annex-muted">{hint}</div>
+      <div className="mt-1 text-xs text-white/35">{hint}</div>
     </div>
   )
 }
