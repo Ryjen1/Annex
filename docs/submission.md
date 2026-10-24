@@ -101,7 +101,7 @@ token, with a live frontend and seeded demo markets.
 | Contract | `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` — https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d |
 | Public repo | https://github.com/Ryjen1/Annex |
 | Deck | [`assets/deck.pdf`](../assets/deck.pdf) (8 slides, PDF) · source: [`assets/deck.html`](../assets/deck.html) |
-| Video | 2-minute pitch — `<YOUTUBE_LINK>` |
+| Video | `assets/video/annex-pitch.mp4` (78 s, 1080p, narrated) — live: https://annex-markets.vercel.app/assets/annex-pitch.mp4 |
 
 ### Brand + media assets
 
@@ -118,6 +118,17 @@ token, with a live frontend and seeded demo markets.
 Screenshot index: `01-landing` (hero), `02-markets` (market list), `03-market-detail`
 (market + trade panel), `04-market-live` (another market), `05-create-market`
 (create flow), `06-mobile-landing` (mobile).
+
+### Pitch video
+
+`assets/video/annex-pitch.mp4` — 78 seconds, 1920×1080, narrated. It is a real screen
+recording of the live app on Mezo Testnet: landing hero → how it works → market list →
+**creating a market on chain** → **buying YES with MUSD** → portfolio → end card. The
+create and buy transactions are real testnet transactions.
+
+Upload it to YouTube (unlisted is fine) and replace the link above with the YouTube URL —
+AKINDO wants a hosted video link rather than a file. The mp4 is also served from
+`https://annex-markets.vercel.app/assets/annex-pitch.mp4` if a direct file link is easier.
 
 ## Updates in this Wave
 
