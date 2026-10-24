@@ -1,17 +1,93 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-annex-bg: #0a0a0a;
-  --color-annex-panel: #131313;
-  --color-annex-panel-2: #1b1b1b;
-  --color-annex-border: #262626;
-  --color-annex-muted: #8a8a8a;
+  --color-annex-bg: #070707;
+  --color-annex-panel: #0f0f10;
+  --color-annex-panel-2: #171719;
+  --color-annex-border: #242426;
+  --color-annex-border-soft: #1c1c1f;
+  --color-annex-muted: #8b8b92;
   --color-annex-orange: #f7931a;
   --color-annex-orange-soft: #ffb454;
+  --color-annex-orange-deep: #c46f0a;
   --color-annex-green: #3ecf8e;
-  --color-annex-red: #ef5350;
+  --color-annex-red: #f2555a;
+  --color-annex-ink: #f6f6f7;
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --radius-4xl: 2rem;
+
+  --animate-fade-up: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-fade-in: fade-in 0.4s ease-out forwards;
+  --animate-scale-in: scale-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-float-slow: float-slow 14s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.6s ease-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(320%);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.06);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(247 147 26 / 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgb(247 147 26 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(247 147 26 / 0);
+  }
 }
 
 html,
@@ -23,33 +99,174 @@ body,
 body {
   margin: 0;
   background-color: var(--color-annex-bg);
-  color: #f5f5f5;
+  color: var(--color-annex-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
   background: var(--color-annex-orange);
-  color: #0a0a0a;
+  color: #070707;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #26262a;
+  border-radius: 999px;
+  border: 2px solid #0a0a0b;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a40;
 }
 
 @utility panel {
+  background-color: color-mix(in oklab, var(--color-annex-panel) 88%, transparent);
+  border: 1px solid var(--color-annex-border-soft);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(14px);
+}
+
+@utility panel-solid {
   background-color: var(--color-annex-panel);
-  border: 1px solid var(--color-annex-border);
-  border-radius: 0.75rem;
+  border: 1px solid var(--color-annex-border-soft);
+  border-radius: 1.25rem;
+}
+
+@utility glass {
+  background-image: linear-gradient(
+    160deg,
+    rgb(255 255 255 / 0.055) 0%,
+    rgb(255 255 255 / 0.015) 42%,
+    rgb(255 255 255 / 0) 100%
+  );
+  background-color: rgb(14 14 16 / 0.72);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-annex-orange-soft) 0%,
+    var(--color-annex-orange) 42%,
+    #ffd9a0 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility glow-orange {
+  box-shadow:
+    0 0 0 1px rgb(247 147 26 / 0.16),
+    0 18px 48px -18px rgb(247 147 26 / 0.45);
+}
+
+@utility ring-orange {
+  box-shadow: 0 0 0 1px rgb(247 147 26 / 0.35), 0 0 32px -8px rgb(247 147 26 / 0.35);
 }
 
 @utility input-field {
   width: 100%;
-  background-color: var(--color-annex-panel-2);
+  background-color: rgb(255 255 255 / 0.035);
   border: 1px solid var(--color-annex-border);
-  border-radius: 0.5rem;
-  padding: 0.625rem 0.75rem;
-  color: #f5f5f5;
-  font-size: 0.875rem;
+  border-radius: 0.875rem;
+  padding: 0.7rem 0.9rem;
+  color: var(--color-annex-ink);
+  font-size: 0.9375rem;
   outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 @utility input-field-focus {
-  border-color: var(--color-annex-orange);
+  border-color: rgb(247 147 26 / 0.7);
+  box-shadow: 0 0 0 3px rgb(247 147 26 / 0.14);
+  background-color: rgb(255 255 255 / 0.05);
+}
+
+@utility btn-primary {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.875rem;
+  background-image: linear-gradient(
+    100deg,
+    var(--color-annex-orange-soft) 0%,
+    var(--color-annex-orange) 55%,
+    var(--color-annex-orange-deep) 100%
+  );
+  color: #100a02;
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    filter 0.2s ease;
+}
+
+@utility btn-primary-hover {
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 38px -16px rgb(247 147 26 / 0.75);
+    filter: brightness(1.06);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+@utility shimmer-skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(255 255 255 / 0.04);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(247 147 26 / 0.09) 45%,
+      transparent 90%
+    );
+    transform: translateX(-120%);
+    animation: var(--animate-shimmer);
+  }
+}
+
+@utility hairline {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.12) 18%,
+    rgb(247 147 26 / 0.35) 50%,
+    rgb(255 255 255 / 0.12) 82%,
+    transparent
+  );
+}
+
+@utility label-caps {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-annex-muted);
 }

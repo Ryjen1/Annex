@@ -11,6 +11,7 @@ import { explorerAddress } from '../lib/chains'
 import { formatDate, formatMusd, formatPercent, formatShares, shortAddress, timeLeft } from '../lib/format'
 import { useMarket } from '../hooks/useMarkets'
 import { useNow } from '../hooks/useNow'
+import { ArrowLeft, ClockIcon, ExternalIcon, ShieldIcon } from '../components/icons'
 
 export function MarketDetail() {
   const { id } = useParams()
@@ -40,12 +41,12 @@ export function MarketDetail() {
   })
 
   if (isLoading) {
-    return <div className="panel h-64 animate-pulse" />
+    return <div className="shimmer-skeleton h-96 rounded-4xl border border-white/6" />
   }
 
   if (!market) {
     return (
-      <div className="panel p-10 text-center text-sm text-annex-muted">
+      <div className="glass rounded-4xl p-12 text-center text-sm text-annex-muted">
         Market not found.{' '}
         <Link to="/" className="text-annex-orange underline">
           Back to markets
@@ -102,41 +103,50 @@ export function MarketDetail() {
   const winningShares = market.outcome === OUTCOME.Yes ? yesShares : noShares
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div>
-        <Link to="/" className="mb-4 inline-block text-sm text-annex-muted hover:text-white">
-          ← All markets
+    <div className="grid gap-6 pb-16 lg:grid-cols-[1fr_380px]">
+      <div className="space-y-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-annex-muted transition-colors hover:text-annex-ink"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          All markets
         </Link>
 
-        <div className="panel p-6">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-annex-panel-2 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-annex-muted">
+        <div className="glass animate-fade-up rounded-4xl p-6 sm:p-8">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-annex-muted">
               {market.category || 'General'}
             </span>
             {market.resolved ? (
-              <span className="rounded-md bg-annex-orange/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-annex-orange">
-                Resolved {market.outcome === OUTCOME.Yes ? 'YES' : 'NO'}
+              <span className="rounded-full border border-annex-orange/30 bg-annex-orange/12 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-annex-orange">
+                Resolved {market.outcome === OUTCOME.Yes ? 'Yes' : 'No'}
               </span>
             ) : (
-              <span className="rounded-md bg-annex-panel-2 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-annex-muted">
+              <span className="flex items-center gap-1.5 rounded-full border border-annex-orange/25 bg-annex-orange/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-annex-orange-soft">
+                <ClockIcon className="h-3 w-3" />
                 {ended ? 'Ended — awaiting resolution' : `${timeLeft(market.endTime, now)} left`}
               </span>
             )}
           </div>
 
-          <h1 className="text-2xl font-bold leading-snug">{market.question}</h1>
+          <h1 className="font-display text-2xl font-semibold leading-snug text-annex-ink sm:text-3xl">
+            {market.question}
+          </h1>
           {market.description && (
-            <p className="mt-3 text-sm leading-relaxed text-annex-muted">{market.description}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-annex-muted">
+              {market.description}
+            </p>
           )}
 
-          <div className="mt-6">
+          <div className="mt-7">
             <PriceBar priceYes={market.priceYes} />
           </div>
 
-          <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
+          <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Detail label="Pool" value={`${formatMusd(market.collateral, 0)} MUSD`} />
-            <Detail label="YES price" value={formatPercent(market.priceYes)} />
-            <Detail label="NO price" value={formatPercent(market.priceNo)} />
+            <Detail label="YES price" value={formatPercent(market.priceYes)} tone="green" />
+            <Detail label="NO price" value={formatPercent(market.priceNo)} tone="red" />
             <Detail label="Closes" value={formatDate(market.endTime)} />
             <Detail
               label="Creator"
@@ -145,9 +155,10 @@ export function MarketDetail() {
                   href={explorerAddress(market.creator)}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-annex-orange hover:underline"
+                  className="inline-flex items-center gap-1 text-annex-orange hover:underline"
                 >
                   {shortAddress(market.creator)}
+                  <ExternalIcon className="h-3 w-3" />
                 </a>
               }
             />
@@ -158,9 +169,10 @@ export function MarketDetail() {
                   href={explorerAddress(market.resolver)}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-annex-orange hover:underline"
+                  className="inline-flex items-center gap-1 text-annex-orange hover:underline"
                 >
                   {shortAddress(market.resolver)}
+                  <ExternalIcon className="h-3 w-3" />
                 </a>
               }
             />
@@ -169,7 +181,7 @@ export function MarketDetail() {
           </dl>
 
           {status && (
-            <div className="mt-5 rounded-lg border border-annex-border bg-annex-panel-2 px-3 py-2 text-xs text-annex-muted">
+            <div className="mt-6 rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3 text-xs text-annex-muted">
               {status === 'pending'
                 ? 'Waiting for confirmation…'
                 : status === 'resolved'
@@ -181,22 +193,29 @@ export function MarketDetail() {
           )}
         </div>
 
-        <div className="panel mt-6 p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-annex-muted">
-            Your position
-          </h2>
-          <div className="grid grid-cols-3 gap-4 text-sm">
-            <Detail label="YES" value={formatShares(yesShares)} />
-            <Detail label="NO" value={formatShares(noShares)} />
-            <Detail label="LP" value={formatShares(lpShares)} />
+        <div className="glass animate-fade-up rounded-4xl p-6 [animation-delay:80ms] sm:p-8">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-annex-muted">
+              Your position
+            </h2>
+            <span className="flex items-center gap-1.5 text-[11px] text-annex-muted">
+              <ShieldIcon className="h-3.5 w-3.5 text-annex-orange" />
+              On-chain
+            </span>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="grid grid-cols-3 gap-3">
+            <Pos label="YES" value={formatShares(yesShares)} tone="green" />
+            <Pos label="NO" value={formatShares(noShares)} tone="red" />
+            <Pos label="LP" value={formatShares(lpShares)} tone="orange" />
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-2">
             {market.resolved && winningShares > 0n && (
               <button
                 onClick={() => run('redeem')}
                 disabled={status === 'pending'}
-                className="rounded-lg bg-annex-orange px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
+                className="btn-primary btn-primary-hover px-4 py-2.5 text-sm"
               >
                 Redeem {formatShares(winningShares)} MUSD
               </button>
@@ -205,7 +224,7 @@ export function MarketDetail() {
               <button
                 onClick={() => run('claim')}
                 disabled={status === 'pending'}
-                className="rounded-lg border border-annex-orange px-4 py-2 text-sm font-semibold text-annex-orange disabled:opacity-50"
+                className="rounded-xl border border-annex-orange/50 px-4 py-2.5 text-sm font-semibold text-annex-orange transition-colors hover:bg-annex-orange/10 disabled:opacity-50"
               >
                 Claim LP
               </button>
@@ -215,14 +234,14 @@ export function MarketDetail() {
                 <button
                   onClick={() => run('resolve', OUTCOME.Yes)}
                   disabled={status === 'pending'}
-                  className="rounded-lg border border-annex-green px-4 py-2 text-sm font-semibold text-annex-green disabled:opacity-50"
+                  className="rounded-xl border border-annex-green/50 px-4 py-2.5 text-sm font-semibold text-annex-green transition-colors hover:bg-annex-green/10 disabled:opacity-50"
                 >
                   Resolve YES
                 </button>
                 <button
                   onClick={() => run('resolve', OUTCOME.No)}
                   disabled={status === 'pending'}
-                  className="rounded-lg border border-annex-red px-4 py-2 text-sm font-semibold text-annex-red disabled:opacity-50"
+                  className="rounded-xl border border-annex-red/50 px-4 py-2.5 text-sm font-semibold text-annex-red transition-colors hover:bg-annex-red/10 disabled:opacity-50"
                 >
                   Resolve NO
                 </button>
@@ -232,18 +251,59 @@ export function MarketDetail() {
         </div>
       </div>
 
-      <div>
+      <div className="lg:sticky lg:top-24 lg:self-start">
         <TradePanel market={market} now={now} />
       </div>
     </div>
   )
 }
 
-function Detail({ label, value }: { label: string; value: React.ReactNode }) {
+function Detail({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: React.ReactNode
+  tone?: 'green' | 'red' | 'orange'
+}) {
+  const toneClass =
+    tone === 'green'
+      ? 'text-annex-green'
+      : tone === 'red'
+        ? 'text-annex-red'
+        : tone === 'orange'
+          ? 'text-annex-orange'
+          : 'text-annex-ink'
+
   return (
-    <div>
-      <dt className="text-[11px] uppercase tracking-wide text-annex-muted">{label}</dt>
-      <dd className="mt-0.5 font-semibold tabular-nums">{value}</dd>
+    <div className="rounded-2xl border border-white/5 bg-white/[0.025] px-3.5 py-3">
+      <dt className="label-caps">{label}</dt>
+      <dd className={`mt-1 font-mono text-sm font-medium tabular-nums ${toneClass}`}>{value}</dd>
+    </div>
+  )
+}
+
+function Pos({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: string
+  tone: 'green' | 'red' | 'orange'
+}) {
+  const toneClass =
+    tone === 'green'
+      ? 'text-annex-green'
+      : tone === 'red'
+        ? 'text-annex-red'
+        : 'text-annex-orange'
+
+  return (
+    <div className="rounded-2xl border border-white/5 bg-white/[0.025] px-3.5 py-3">
+      <span className="label-caps">{label}</span>
+      <div className={`mt-1 font-mono text-base font-semibold tabular-nums ${toneClass}`}>{value}</div>
     </div>
   )
 }

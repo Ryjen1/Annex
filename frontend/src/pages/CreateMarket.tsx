@@ -7,6 +7,7 @@ import { useAccount, usePublicClient, useWriteContract } from 'wagmi'
 import { annexMarketAbi } from '../lib/abi'
 import { ANNEX_ADDRESS, CATEGORIES, MUSD_ADDRESS } from '../lib/contracts'
 import { formatMusd, parseMusdInput } from '../lib/format'
+import { PlusIcon } from '../components/icons'
 
 function endTimeFromNow(durationDays: number): bigint {
   return BigInt(Math.floor(Date.now() / 1000) + durationDays * 86400)
@@ -79,16 +80,27 @@ export function CreateMarket() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold tracking-tight">Create a market</h1>
-      <p className="mt-1 text-sm text-annex-muted">
-        Anyone can create a market. You seed the pool with MUSD and become the initial liquidity
-        provider — you earn the spread when traders take the other side.
-      </p>
+    <div className="mx-auto max-w-2xl pb-16">
+      <div className="animate-fade-up pt-10 sm:pt-14">
+        <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-annex-orange/25 bg-annex-orange/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-annex-orange-soft">
+          <PlusIcon className="h-3 w-3" />
+          Permissionless
+        </span>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-annex-ink sm:text-4xl">
+          Create a <span className="text-gradient">market</span>
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-annex-muted sm:text-base">
+          Anyone can create a market. You seed the pool with MUSD and become the initial liquidity
+          provider — you earn the spread when traders take the other side.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="panel mt-6 space-y-5 p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="glass animate-fade-up mt-8 space-y-6 rounded-4xl p-6 [animation-delay:80ms] sm:p-8"
+      >
         <div>
-          <label className="mb-1 block text-xs font-medium text-annex-muted" htmlFor="question">
+          <label className="label-caps mb-2 block" htmlFor="question">
             Question
           </label>
           <input
@@ -97,13 +109,13 @@ export function CreateMarket() {
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="Will BTC close above $100,000 this month?"
             maxLength={140}
-            className="input-field"
+            className="input-field focus:input-field-focus"
             required
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-annex-muted" htmlFor="description">
+          <label className="label-caps mb-2 block" htmlFor="description">
             Resolution criteria
           </label>
           <textarea
@@ -112,20 +124,22 @@ export function CreateMarket() {
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Resolves YES if the daily close at 23:59 UTC is above 100,000 USD."
             rows={3}
-            className="input-field resize-none"
+            className="input-field focus:input-field-focus resize-none"
           />
         </div>
 
         <div>
-          <span className="mb-1 block text-xs font-medium text-annex-muted">Category</span>
-          <div className="flex flex-wrap gap-1.5">
+          <span className="label-caps mb-2 block">Category</span>
+          <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => setCategory(item)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  category === item ? 'bg-annex-orange text-black' : 'bg-annex-panel-2 text-annex-muted hover:text-white'
+                className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200 ${
+                  category === item
+                    ? 'bg-annex-orange text-black shadow-[0_10px_26px_-12px_rgba(247,147,26,0.9)]'
+                    : 'border border-white/8 bg-white/4 text-annex-muted hover:border-white/15 hover:text-annex-ink'
                 }`}
               >
                 {item}
@@ -136,7 +150,7 @@ export function CreateMarket() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-medium text-annex-muted" htmlFor="duration">
+            <label className="label-caps mb-2 block" htmlFor="duration">
               Duration (days)
             </label>
             <input
@@ -146,12 +160,12 @@ export function CreateMarket() {
               max="365"
               value={duration}
               onChange={(event) => setDuration(event.target.value)}
-              className="input-field tabular-nums"
+              className="input-field focus:input-field-focus font-mono tabular-nums"
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-annex-muted" htmlFor="liquidity">
+            <label className="label-caps mb-2 block" htmlFor="liquidity">
               Initial liquidity (MUSD)
             </label>
             <input
@@ -161,19 +175,19 @@ export function CreateMarket() {
               step="1"
               value={liquidity}
               onChange={(event) => setLiquidity(event.target.value)}
-              className="input-field tabular-nums"
+              className="input-field focus:input-field-focus font-mono tabular-nums"
               required
             />
           </div>
         </div>
 
-        <div className="rounded-lg border border-annex-border bg-annex-panel-2 px-4 py-3 text-xs text-annex-muted">
+        <div className="rounded-2xl border border-annex-orange/20 bg-annex-orange/[0.06] px-4 py-3.5 text-xs leading-relaxed text-annex-orange-soft">
           The pool starts balanced at 50 / 50. You are the only liquidity provider, so every trade
           pays the spread straight into your LP position.
         </div>
 
         {status && (
-          <div className="rounded-lg border border-annex-red/40 bg-annex-red/10 px-3 py-2 text-xs text-annex-red">
+          <div className="rounded-xl border border-annex-red/40 bg-annex-red/10 px-3 py-2.5 text-xs text-annex-red">
             {status}
           </div>
         )}
@@ -181,7 +195,7 @@ export function CreateMarket() {
         <button
           type="submit"
           disabled={!isConnected || !valid || pending}
-          className="w-full rounded-xl bg-annex-orange px-4 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="btn-primary btn-primary-hover w-full px-4 py-3 text-sm"
         >
           {!isConnected
             ? 'Connect wallet to create'
