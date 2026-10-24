@@ -159,6 +159,19 @@ create + portfolio pages render, no console errors.
 - **Wallet cleanup** — removed the placeholder WalletConnect connector (invalid project id
   caused rejected relay requests in the console); Bitcoin + injected EVM wallets remain
 
+### 11. Submission assets ✅ (session 3)
+- **`assets/`** — original vector brand kit in the Bitcoin palette: `logo-mark.svg` (coin),
+  `logo-lockup.svg` (wordmark), `banner.svg` (1600×900), `og-card.svg` (1200×630) — all
+  exported to PNG (logos transparent)
+- **Deck** — `assets/deck.html` (8 slides, same visual language) exported to
+  `assets/deck.pdf` + `assets/slides/slide-01…08.png`
+- **Screenshots** — `assets/screenshots/`: landing, markets, market detail, second market,
+  create flow, mobile landing — captured from the live app
+- **Stable URLs** — the same files are served from the app, so the submission can link them:
+  `https://annex-markets.vercel.app/assets/{banner.png, og-card.png, logo-mark.png,
+  logo-lockup.png, deck.pdf}`. Favicon + OG/Twitter meta tags point at the new brand.
+- Asset index with file paths and live URLs is in `docs/submission.md`.
+
 ---
 
 ## What's NOT Done Yet (priority order)
