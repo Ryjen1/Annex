@@ -144,10 +144,13 @@ create + portfolio pages render, no console errors.
   detail, create and portfolio pages verified in headless Chrome against live testnet data
 
 ### 10. Frontend redesign ✅ (session 3)
-- **Design system** — `frontend/src/index.css`: glass surfaces, gradient brand text, glow
-  utilities, shimmer skeletons, ambient orange bloom backdrop, Space Grotesk + Inter pairing
-- **Pages** — floating pill nav, hero + stat strip on markets, glass market cards with hover
-  lift, restyled market detail / trade panel / create / portfolio
+- **Design system** — `frontend/src/index.css`: deep navy `#030412` base, Outfit display type
+  with Poppins body, glass surfaces, gradient brand text, glow utilities, shimmer skeletons,
+  ambient orange bloom backdrop
+- **Landing page** (`pages/Landing.tsx` + `components/HeroScene.tsx`) — full-screen hero with
+  original SVG scene (glowing coin, orbital field, ridged horizon), three-step explainer,
+  live featured markets read from the chain, CTA band. `/markets` is the full market list.
+- **Floating pill nav** — fixed, `blur(24px)`, black/25, white/10 hairline, gradient brand
 - **Live AMM price curve** (`components/PriceCurve.tsx`, `hooks/usePriceCurve.ts`) — 21 points
   read from the contract's own `getBuyQuote` in one multicall, plus price-impact and
   average-price derived from those quotes. Verified against a fork of Mezo Testnet:

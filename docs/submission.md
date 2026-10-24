@@ -97,7 +97,7 @@ token, with a live frontend and seeded demo markets.
 
 | What | Link |
 |------|------|
-| Live app | https://annex-markets.vercel.app |
+| Live app | https://annex-markets.vercel.app (landing) · https://annex-markets.vercel.app/markets (market list) |
 | Contract | `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` — https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d |
 | Public repo | https://github.com/Ryjen1/Annex |
 | Deck | [`docs/pitch-deck.md`](pitch-deck.md) (8 slides, in the repo) |
@@ -118,10 +118,11 @@ Wave 1 shipped the complete protocol end to end:
 - **51 Foundry tests:** unit, fuzz over random trade sequences, reentrancy against a
   malicious token, resolution authorisation and timing, redemption, LP claims, and
   quote-vs-execution-price consistency. All green.
-- **Frontend:** markets list with live prices and pool depth, market detail with a live quote
-  and average execution price, approve → buy flow, create market, portfolio with position and
-  redeem, resolver controls, wallet connector via Mezo Passport (MetaMask / Xverse / Unisat /
-  OKX / WalletConnect).
+- **Frontend:** landing page with a live hero and featured markets pulled from the chain, market
+  list with live prices and pool depth, market detail with a live quote and average execution
+  price, a live AMM price curve drawn from the contract's own quotes, approve → buy flow, create
+  market, portfolio with position and redeem, resolver controls, wallet connector via Mezo
+  Passport (MetaMask / Xverse / Unisat / OKX).
 - **Deployment:** forge deploy + seed scripts, deployed to Mezo Testnet against canonical
   MUSD — `0xfdbfde0a430de94c1d862cfc290c36549b5a501d`, seven markets seeded (6 live + 1
   resolved end-to-end smoke test), frontend published at annex-markets.vercel.app and

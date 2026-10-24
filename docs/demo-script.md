@@ -19,13 +19,17 @@
 4. MetaMask unlocked on the Mezo Testnet network, account visible, notifications silenced.
 5. Tabs ready: `annex-markets.vercel.app` (app) and `explorer.test.mezo.org` (contract).
 
+Route map: `/` is the landing page (hero + explainer + live featured markets),
+`/markets` is the full market list, `/market/<id>` is a market, `/create` and
+`/portfolio` are the write paths.
+
 ## The shots
 
 | # | Time | On screen | Voiceover / on-screen text |
 |---|------|-----------|---------------------------|
 | 1 | 0:00–0:10 | Title card: `Annex` + tagline | "Bitcoin has the money, the users and the finality — and no venue for collective opinion. Annex is a permissionless prediction market that runs natively on Mezo." |
 | 2 | 0:10–0:20 | Explorer tab: the deployed `AnnexMarket` contract | "One contract. No custody, no upgrade key, no admin pricing. Anyone can create a market." |
-| 3 | 0:20–0:35 | Markets list (live prices, pools, countdown) | "Buyers take YES or NO from an on-chain constant-product AMM. The price you see is the marginal price — reserve NO over total reserves — so the quote is the price you pay." |
+| 3 | 0:20–0:35 | Landing hero, then `/markets` (live prices, pools, countdown) | "Buyers take YES or NO from an on-chain constant-product AMM. The price you see is the marginal price — reserve NO over total reserves — so the quote is the price you pay." |
 | 4 | 0:35–0:50 | Market detail: trade panel, enter 25 MUSD, live quote | "Twenty-five MUSD buys forty-nine shares of YES, at a shown average price. No order book, no operator, no hidden markup." |
 | 5 | 0:50–1:05 | MetaMask approve popup → MetaMask sign popup → position updates, price moves | "Approve MUSD once. Trade. The pool price moves immediately and the position shows what you own." |
 | 6 | 1:05–1:20 | Solvency line in the terminal or architecture doc (`totalCollateral == totalYes == totalNo`) | "Every MUSD deposited mints exactly one YES and one NO share, so whichever side wins, every winning share is backed one-to-one." |
