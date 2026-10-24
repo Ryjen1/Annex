@@ -8,10 +8,16 @@
 
 1. Wallet funded on Mezo Testnet: testnet BTC for gas + MUSD for trading (`docs/submission.md`
    explains the MUSD route: faucet BTC → borrow MUSD in the Mezo testnet app).
-2. Deployed AnnexMarket + seeded markets — one market that is **already past `endTime`** so
-   resolution can be shown on camera, plus one open market for the trade.
-3. MetaMask unlocked on the Mezo Testnet network, account visible, notifications silenced.
-4. Tabs ready: `annex-markets.vercel.app` (app) and `explorer.test.mezo.org` (contract).
+2. **Live deployment** — `AnnexMarket` at
+   `0xfdbfde0a430de94c1d862cfc290c36549b5a501d`
+   (https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d),
+   app at https://annex-markets.vercel.app, seven markets live.
+3. Market ids to use on camera: **0** (BTC > $100k — already traded, price at ~59% YES),
+   **1** (Mezo 1M txns — traded, ~42% YES), **5** ("Will Annex's first demo market resolve
+   YES?" — 30-minute market, created for the resolve→redeem shots; the deployer/owner can
+   resolve it early).
+4. MetaMask unlocked on the Mezo Testnet network, account visible, notifications silenced.
+5. Tabs ready: `annex-markets.vercel.app` (app) and `explorer.test.mezo.org` (contract).
 
 ## The shots
 

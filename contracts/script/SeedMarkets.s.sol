@@ -59,41 +59,48 @@ contract SeedMarkets is Script {
     }
 
     function _seeds() internal pure returns (Seed[] memory seeds) {
-        seeds = new Seed[](5);
+        seeds = new Seed[](6);
         seeds[0] = Seed({
             question: "Will BTC close above $100,000 this month?",
             description: "Resolves YES if the Binance BTC/USDT daily close at 23:59 UTC is above 100,000 USD on the last day of the month.",
             category: "BTC Price",
             duration: 30 days,
-            liquidity: 1_000 ether
+            liquidity: 500 ether
         });
         seeds[1] = Seed({
             question: "Will Mezo process more than 1M transactions this week?",
             description: "Resolves YES if the Mezo testnet explorer reports more than 1,000,000 transactions in the calendar week.",
             category: "Mezo",
             duration: 7 days,
-            liquidity: 500 ether
+            liquidity: 300 ether
         });
         seeds[2] = Seed({
             question: "Will ETH flip BTC market cap this quarter?",
             description: "Resolves YES if Ethereum's market capitalisation exceeds Bitcoin's on any single day before the quarter ends.",
             category: "Crypto",
             duration: 60 days,
-            liquidity: 2_000 ether
+            liquidity: 700 ether
         });
         seeds[3] = Seed({
             question: "Will a Bitcoin ETF see net inflows for 5 straight days?",
             description: "Resolves YES if spot Bitcoin ETFs record positive net inflows on five consecutive trading days before the deadline.",
             category: "Crypto",
             duration: 14 days,
-            liquidity: 1_500 ether
+            liquidity: 400 ether
         });
         seeds[4] = Seed({
             question: "Will the next Mezo hard fork ship before December?",
             description: "Resolves YES if the Mezo core team publishes a hard fork release before 1 December.",
             category: "Mezo",
             duration: 45 days,
-            liquidity: 750 ether
+            liquidity: 300 ether
+        });
+        seeds[5] = Seed({
+            question: "Will Annex's first demo market resolve YES?",
+            description: "A short market created to show the full lifecycle on camera: trade, resolve, redeem. Resolves YES once the demo trades are recorded.",
+            category: "Other",
+            duration: 30 minutes,
+            liquidity: 200 ether
         });
     }
 }

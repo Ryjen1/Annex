@@ -98,7 +98,7 @@ token, with a live frontend and seeded demo markets.
 | What | Link |
 |------|------|
 | Live app | https://annex-markets.vercel.app |
-| Contract | `0x<ANNEX_ADDRESS>` — https://explorer.test.mezo.org/address/0x<ANNEX_ADDRESS> |
+| Contract | `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` — https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d |
 | Public repo | https://github.com/Ryjen1/Annex |
 | Deck | [`docs/pitch-deck.md`](pitch-deck.md) (8 slides, in the repo) |
 | Video | 2-minute pitch — `<YOUTUBE_LINK>` |
@@ -123,7 +123,9 @@ Wave 1 shipped the complete protocol end to end:
   redeem, resolver controls, wallet connector via Mezo Passport (MetaMask / Xverse / Unisat /
   OKX / WalletConnect).
 - **Deployment:** forge deploy + seed scripts, deployed to Mezo Testnet against canonical
-  MUSD, frontend published and pointed at the deployed contract.
+  MUSD — `0xfdbfde0a430de94c1d862cfc290c36549b5a501d`, seven markets seeded (6 live + 1
+  resolved end-to-end smoke test), frontend published at annex-markets.vercel.app and
+  pointed at the deployed contract.
 - **Docs:** protocol README, AMM architecture notes, pitch deck and this submission copy.
 
 ## Future milestones
@@ -149,6 +151,6 @@ Wave 1 shipped the complete protocol end to end:
 - [x] Working deployment on a supported chain (Mezo Testnet)
 - [x] Public GitHub repository
 - [x] Product deck (8 slides)
-- [ ] Live project link reachable with the deployed contract
+- [x] Live project link reachable with the deployed contract
 - [ ] 2-minute pitch video uploaded
 - [ ] Team info filled in

@@ -122,45 +122,47 @@ create + portfolio pages render, no console errors.
 ### 8. Wave 1 submission prep ✅ (session 3)
 - **Public repo** — https://github.com/Ryjen1/Annex (first commit `e320783`, pushed to `main`)
 - **Frontend deployed** — https://annex-markets.vercel.app (Vercel project `annex-markets`,
-  VITE_* env vars set there, `frontend/.vercelignore` keeps local `.env` out of the upload)
+  VITE_* env vars set there, `frontend/.vercelignore` keeps local `.env` out of the upload,
+  `frontend/vercel.json` rewrites SPA routes to `index.html`)
 - **Submission copy** — `docs/submission.md`: paste-ready answers for every AKINDO form field
   (name, category, TL;DR, how it works, target group, stack, track, chain, status, readiness,
   links, wave updates, milestones, team info) + checklist
 - **Video shot list** — `docs/demo-script.md`: 9-shot, 120 s recording plan with voiceover
 - **Deployer key** — generated at `~/.annex/deployer.key` (outside the repo),
-  address `0xac89fFA908D0bD7A9EE78DfAd4b40362d9971b15`; needs testnet BTC + MUSD from the user
+  address `0xac89fFA908D0bD7A9EE78DfAd4b40362d9971b15`
+
+### 9. Mezo Testnet deployment ✅ (session 3)
+- **AnnexMarket live:** `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` (canonical MUSD
+  `0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503` as settlement token)
+  — https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d
+- **MUSD obtained on-chain:** opened a trove via BorrowerOperations
+  `0xCdF7028ceAB81fA0C6971208e83fa7872994beE5` — 0.045 BTC collateral → 3,000 MUSD
+- **Markets seeded:** 6 demo markets + 1 lifecycle smoke-test market (id 6) that was
+  created, traded, resolved YES, redeemed and LP-claimed end to end
+- **Demo trades placed:** YES on market 0, NO on market 1 (prices moved off 50/50)
+- **Frontend repointed** at the deployed contract and redeployed; markets list, market
+  detail, create and portfolio pages verified in headless Chrome against live testnet data
 
 ---
 
 ## What's NOT Done Yet (priority order)
 
-### A. Deploy to Mezo testnet (HIGH — waiting on funding)
-The deployer address `0xac89fFA908D0bD7A9EE78DfAd4b40362d9971b15` must be funded with testnet
-BTC (gas) and MUSD (liquidity + demo trading). Once funded:
-```bash
-export PRIVATE_KEY=$(cat ~/.annex/deployer.key)
-export RPC_URL=https://rpc.test.mezo.org
-cd contracts
-forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
-ANNEX_ADDRESS=0x... forge script script/SeedMarkets.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
-```
-Then set `VITE_ANNEX_ADDRESS` in the Vercel project env (`vercel env add ... --force`),
-redeploy, and record the address in README + `docs/submission.md`.
+### A. Demo video (HIGH — script ready, needs recording)
+AKINDO asks for a **2-minute** pitch video. `docs/demo-script.md` has the shot list. Record
+with the deployed contract live: markets list → market detail → approve+buy YES → resolve →
+redeem. The 30-minute demo market (id 5, "Will Annex's first demo market resolve YES?")
+ends 30 min after creation and can be resolved by the deployer/owner for the resolve→redeem
+shots. Upload to YouTube (unlisted is fine) and paste the link into `docs/submission.md`.
 
-### B. MUSD on testnet (HIGH — blocks any real trading demo)
-MUSD is a CDP stablecoin: faucet BTC → open a trove (Mezo app or BorrowerOperations
-`0xCdF7028ceAB81fA0C6971208e83fa7872996beE5`) → borrow MUSD.
+### B. Team info + AKINDO form (HIGH)
+Fill in the team table in `docs/submission.md` (names, roles, X/LinkedIn), then paste the
+answers into the submission form before **Oct 26, 16:00 UTC**.
 
 ### C. Pitch deck ✅
 `docs/pitch-deck.md` — 8 slides: problem, solution, AMM mechanics, safety invariant, demo
 flow, what is built, roadmap. No external project names.
 
-### D. Demo video (MEDIUM — script done, recording pending)
-`docs/demo-script.md` has the 120 s shot list. AKINDO asks for a **2-minute** pitch video:
-record after the testnet deployment so the contract address, seeded markets and a
-past-`endTime` market are on camera.
-
-### E. Nice-to-have (only if time remains)
+### D. Nice-to-have (only if time remains)
 - Transferable LP shares (secondary LP market) — currently creator-only.
 - A market activity/history chart (price over time).
 - Health endpoint / event log page.

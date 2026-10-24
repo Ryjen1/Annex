@@ -8,7 +8,8 @@ MUSD. No custody, no admin, no off-chain operators — the whole protocol is one
 
 - **Chain:** Mezo Testnet (chain id `31611`, gas paid in BTC)
 - **Settlement asset:** MUSD (`0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503`, 18 decimals)
-- **Contract:** [`contracts/src/AnnexMarket.sol`](contracts/src/AnnexMarket.sol)
+- **Contract:** [`contracts/src/AnnexMarket.sol`](contracts/src/AnnexMarket.sol) — deployed at
+  [`0xfdbfde0a430de94c1d862cfc290c36549b5a501d`](https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d)
 - **Live app:** https://annex-markets.vercel.app
 - **Repo:** https://github.com/Ryjen1/Annex
 - **Deck:** [`docs/pitch-deck.md`](docs/pitch-deck.md) · **Submission copy:**
