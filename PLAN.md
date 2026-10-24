@@ -120,7 +120,7 @@ create + portfolio pages render, no console errors.
 - `docs/architecture.md` — AMM design, invariants, settlement maths, roles, limitations
 
 ### 8. Wave 1 submission prep ✅ (session 3)
-- **Public repo** — https://github.com/Ryjen1/Annex (first commit `e320783`, pushed to `main`)
+- **Public repo** — https://github.com/Ryjen1/Annex (first commit `3646b4f`, pushed to `main`)
 - **Frontend deployed** — https://annex-markets.vercel.app (Vercel project `annex-markets`,
   VITE_* env vars set there, `frontend/.vercelignore` keeps local `.env` out of the upload,
   `frontend/vercel.json` rewrites SPA routes to `index.html`)
