@@ -1,8 +1,8 @@
 # Annex — Build Plan & Status
 
-> **Last updated:** Session 3 — Wave 1 submission prep (public repo + Vercel deploy +
-> submission copy + video shot list done; contract deploy blocked on testnet funding).
-> **Wave 1 deadline: Oct 26, 2026, 16:00 UTC.**
+> **Last updated:** Session 4 — Wave 2 upgrade (Mezo PriceFeed BTC markets, in-app Trove
+> funding via BorrowerOperations/TroveManager, 0.30% entry protocol fee, 65 Foundry tests,
+> updated frontend + docs + deck; live Wave 2 deploy/verify/submission gated on keys/auth).
 
 ## What is Annex?
 
@@ -33,7 +33,8 @@ never appear in code, docs, README or commit messages.
 
 **MUSD notes:** MUSD has 18 decimals. It's a CDP stablecoin — to get MUSD on testnet, you
 get testnet BTC from the faucet, then open a trove via the Mezo app or BorrowerOperations
-contract (`0xCdF7028ceAB81fA0C6971208e83fa7872996beE5`).
+contract (`0xCdF7028ceAB81fA0C6971208e83fa7872994beE5`). See `README.md` for all verified
+Mezo Testnet addresses (`TroveManager`, `PriceFeed`, `HintHelpers`, `SortedTroves`).
 
 ---
 
@@ -172,37 +173,58 @@ create + portfolio pages render, no console errors.
   logo-lockup.png, deck.pdf}`. Favicon + OG/Twitter meta tags point at the new brand.
 - Asset index with file paths and live URLs is in `docs/submission.md`.
 
-### 12. Pitch video ✅ (session 3)
+### 12. Wave 1 Pitch video ✅ (session 3)
 - **`assets/video/annex-pitch.mp4`** — 78 s, 1920×1080 H.264, narrated (neural TTS), captions
-  burned in. Real screen recording of the live app: landing hero → how it works → market
-  list → **create a market on chain** → **buy YES with MUSD** → portfolio → end card. The
-  create and buy are real testnet transactions.
-- Served at `https://annex-markets.vercel.app/assets/annex-pitch.mp4`; upload to YouTube
-  (unlisted) for the submission and swap the link in `docs/submission.md`.
+  burned in. Real screen recording of the Wave 1 app: landing hero → how it works → market
+  list → **create a market on chain** → **buy YES with MUSD** → portfolio → end card.
+- Served at `https://annex-markets.vercel.app/assets/annex-pitch.mp4`; Wave 2 demo shot list
+  is updated in `docs/demo-script.md`.
+
+### 13. Wave 2 Deep Mezo Integration & Protocol Fee ✅ (session 4)
+- **BTC/USD PriceFeed markets (`AnnexMarket.sol`):** separate `MarketKind.PriceFeed` path
+  (`createPriceMarket`, permissionless `resolvePriceMarket`, `getPriceMarket`, `liveBtcPrice`)
+  strictly separated from `MarketKind.Manual` (`resolve`, `setResolver`). Manual overrides
+  revert on PriceFeed markets.
+- **In-app Trove funding (`frontend/` + `getUserTroveState`):** live Trove telemetry (`coll`,
+  `debt`, `ICR`, liquidation price, `maxBorrowingCapacity`) via `TroveManager` + `PriceFeed`,
+  plus `/trove` and inline `TroveFundingPanel` inside `TradePanel` and `CreateMarket` wired to
+  `BorrowerOperations` (`0xCdF7028ceAB81fA0C6971208e83fa7872994beE5`) with `HintHelpers` +
+  `SortedTroves`, handling `openTrove`, `addColl`, `adjustTrove`, and
+  `addColl → refinance → withdrawMUSD`.
+- **Protocol fee (`0.30%` / `30 bps`, cap `200 bps`):** deducted on `buyShares` entry, isolated
+  in `accruedFees` apart from `totalLockedCollateral` (`claimFees` owner-only, 0% exit fee on
+  1:1 `redeem` / `claimLp`). Disclosed pre-trade via `getBuyQuoteWithFee`.
+- **Idle-pool yield assessed & deferred:** verified `StabilityPool` on-chain withdrawal lock
+  (`_requireNoUnderCollateralizedTroves()`) and Mezo Pools IL risk would jeopardize 1:1
+  redemption guarantees; documented in `README.md` and `docs/architecture.md`.
+- **Tests (`65 total`):** all 51 Wave 1 tests intact + 14 Wave 2 unit/fuzz tests in
+  `contracts/test/AnnexMarketWave2.t.sol`.
+- **Scripts:** updated `DeployAnnex.s.sol` & `SeedMarkets.s.sol`, added `SmokeTestWave2.s.sol`.
 
 ---
 
-## What's NOT Done Yet (priority order)
+## What's NOT Done Yet (requires deployer keys / auth / human recording)
 
-### A. Demo video (HIGH — script ready, needs recording)
-AKINDO asks for a **2-minute** pitch video. `docs/demo-script.md` has the shot list. Record
-with the deployed contract live: markets list → market detail → approve+buy YES → resolve →
-redeem. The 30-minute demo market (id 5, "Will Annex's first demo market resolve YES?")
-ends 30 min after creation and can be resolved by the deployer/owner for the resolve→redeem
-shots. Upload to YouTube (unlisted is fine) and paste the link into `docs/submission.md`.
+### A. Wave 2 Testnet Deployment, Blockscout Verification & Live Seed (HIGH)
+- Run `DeployAnnex.s.sol`, verify `AnnexMarket` on `https://explorer.test.mezo.org`, run
+  `SeedMarkets.s.sol` & `SmokeTestWave2.s.sol`, update `VITE_ANNEX_ADDRESS`, and redeploy
+  frontend (blocked on user `PRIVATE_KEY` + Vercel auth).
 
-### B. Team info + AKINDO form (HIGH)
-Fill in the team table in `docs/submission.md` (names, roles, X/LinkedIn), then paste the
-answers into the submission form before **Oct 26, 16:00 UTC**.
+### B. Real External-User Testnet Activity & Wave 2 Demo Video (HIGH)
+- Execute real trades from non-deployer wallets against the deployed Wave 2 contract and record
+  the updated 2-minute Wave 2 walkthrough per `docs/demo-script.md` (Trove open/top-up →
+  PriceFeed market + 0.30% fee buy → permissionless settle → 1:1 redeem → `claimFees`), then
+  host on YouTube and link in `docs/submission.md`.
 
-### C. Pitch deck ✅
-`docs/pitch-deck.md` — 8 slides: problem, solution, AMM mechanics, safety invariant, demo
-flow, what is built, roadmap. No external project names.
+### C. Team info + AKINDO Form Update (HIGH)
+- Fill in the team table + real-user tx evidence in `docs/submission.md`, then submit the Wave 2
+  copy from `docs/submission.md` / `docs/akindo-form-answers.md` on AKINDO (fixes Wave 1
+  `#ERROR!` overview and empty team fields).
 
-### D. Nice-to-have (only if time remains)
+### D. Nice-to-have (deferred — low priority)
 - Transferable LP shares (secondary LP market) — currently creator-only.
 - A market activity/history chart (price over time).
-- Health endpoint / event log page.
+- Yield routing via MUSD Savings vault once live on Mezo mainnet with atomic liquidity.
 
 ---
 
@@ -212,26 +234,32 @@ flow, what is built, roadmap. No external project names.
 # Contracts
 cd contracts
 forge build                    # compile
-forge test -vvv                # run the 51 tests
+forge test -vvv                # run all 65 tests (51 Wave 1 + 14 Wave 2)
 forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
+forge verify-contract <ADDRESS> src/AnnexMarket.sol:AnnexMarket \
+  --verifier blockscout --verifier-url https://explorer.test.mezo.org/api/ \
+  --constructor-args $(cast abi-encode "constructor(address,address,address,uint256)" \
+    0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503 \
+    0x86bCF0841622a5dAC14A313a15f96A95421b9366 \
+    0xE47c80e8c23f6B4A1aE41c34837a0599D5D16bb0 30)
 
 # Frontend
 cd frontend
 npm run dev                    # start dev server
-npm run build                  # production build
+npm run build                  # typecheck + production bundle
+npm run lint                   # oxlint
 
-# Local anvil (chain id 31611 to match Mezo)
-anvil --chain-id 31611
+# Local anvil (Mezo Testnet EVM uses shanghai/london headers without blob gas)
+anvil --chain-id 31611 --hardfork shanghai
 ```
 
 ---
 
-## Critical Constraints (from PRD)
+## Critical Constraints (from PRD + Wave 2 Update)
 
 - **The product name is "Annex"** — the original PRD name must never appear anywhere
 - Do NOT reference, link, credit, or mention any external prediction market project anywhere public
 - MUSD is the only accepted currency
-- All funds remain in smart contracts (non-custodial)
-- No complex oracle — admin/resolver resolution only
-- Wave 1 deadline: **Oct 26**
+- All funds remain in smart contracts (non-custodial); protocol fees remain isolated from locked collateral
+- Subjective markets (`MarketKind.Manual`) stay resolver/owner only; BTC/USD strike markets (`MarketKind.PriceFeed`) settle permissionlessly against canonical Mezo `PriceFeed`
 - Gas paid in BTC (Mezo native)
