@@ -23,7 +23,7 @@ contract AnnexMarketTest is Test {
 
     function setUp() public {
         musd = new MockMUSD();
-        annex = new AnnexMarket(address(musd));
+        annex = new AnnexMarket(address(musd), address(0), address(0), 0);
 
         alice = makeAddr("alice");
         bob = makeAddr("bob");
@@ -735,7 +735,7 @@ contract AnnexMarketTest is Test {
 
     function test_ReentrancyGuard_BlocksNestedBuy() public {
         ReentrantMUSD token = new ReentrantMUSD();
-        AnnexMarket market = new AnnexMarket(address(token));
+        AnnexMarket market = new AnnexMarket(address(token), address(0), address(0), 0);
         token.setTarget(address(market));
         token.setMarketId(0);
 
