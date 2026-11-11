@@ -6,18 +6,27 @@ import {console} from "forge-std/console.sol";
 import {AnnexMarket} from "../src/AnnexMarket.sol";
 import {IERC20} from "../src/IERC20.sol";
 
-/// @notice Seeds a handful of demo markets on an already-deployed AnnexMarket.
+/// @notice Seeds demo markets (both PriceFeed BTC/USD oracle markets and manual resolver markets).
 ///
 ///         Usage:
 ///           ANNEX_ADDRESS=0x... forge script script/SeedMarkets.s.sol \
 ///             --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 contract SeedMarkets is Script {
-    struct Seed {
+    struct ManualSeed {
         string question;
         string description;
         string category;
         uint256 duration; // seconds from now
         uint256 liquidity; // MUSD
+    }
+
+    struct PriceSeed {
+        string question;
+        string description;
+        uint256 duration;
+        uint256 liquidity;
+        uint256 strikePrice;
+        bool resolveAbove;
     }
 
     function run() external returns (uint256[] memory ids) {
@@ -32,72 +41,95 @@ contract SeedMarkets is Script {
         AnnexMarket annex = AnnexMarket(annexAddr);
         IERC20 musd = IERC20(annex.musd());
 
-        uint256 pk2 = vm.envOr("PRIVATE_KEY", uint256(0));
-        address deployer = pk2 != 0 ? vm.addr(pk2) : msg.sender;
+        address deployer = pk != 0 ? vm.addr(pk) : msg.sender;
         musd.approve(annexAddr, type(uint256).max);
 
-        Seed[] memory seeds = _seeds();
+        PriceSeed[] memory priceSeeds = _priceSeeds();
+        ManualSeed[] memory manualSeeds = _manualSeeds();
 
-        ids = new uint256[](seeds.length);
-        for (uint256 i = 0; i < seeds.length; i++) {
-            ids[i] = annex.createMarket(
-                seeds[i].question,
-                seeds[i].description,
-                seeds[i].category,
-                block.timestamp + seeds[i].duration,
-                seeds[i].liquidity
+        ids = new uint256[](priceSeeds.length + manualSeeds.length);
+        uint256 idx = 0;
+
+        for (uint256 i = 0; i < priceSeeds.length; i++) {
+            ids[idx] = annex.createPriceMarket(
+                priceSeeds[i].question,
+                priceSeeds[i].description,
+                block.timestamp + priceSeeds[i].duration,
+                priceSeeds[i].liquidity,
+                priceSeeds[i].strikePrice,
+                priceSeeds[i].resolveAbove
             );
-            console.log("Market created:", ids[i]);
-            console.log("  ", seeds[i].question);
+            console.log("PriceFeed Market created:", ids[idx]);
+            console.log("  ", priceSeeds[i].question);
+            idx++;
+        }
+
+        for (uint256 i = 0; i < manualSeeds.length; i++) {
+            ids[idx] = annex.createMarket(
+                manualSeeds[i].question,
+                manualSeeds[i].description,
+                manualSeeds[i].category,
+                block.timestamp + manualSeeds[i].duration,
+                manualSeeds[i].liquidity
+            );
+            console.log("Manual Market created:", ids[idx]);
+            console.log("  ", manualSeeds[i].question);
+            idx++;
         }
 
         vm.stopBroadcast();
 
         console.log("----------------------------------------------------------");
-        console.log("Seeded", seeds.length, "markets from", deployer);
+        console.log("Seeded", ids.length, "markets from", deployer);
         console.log("----------------------------------------------------------");
     }
 
-    function _seeds() internal pure returns (Seed[] memory seeds) {
-        seeds = new Seed[](6);
-        seeds[0] = Seed({
-            question: "Will BTC close above $100,000 this month?",
-            description: "Resolves YES if the Binance BTC/USDT daily close at 23:59 UTC is above 100,000 USD on the last day of the month.",
-            category: "BTC Price",
-            duration: 30 days,
-            liquidity: 500 ether
+    function _priceSeeds() internal pure returns (PriceSeed[] memory seeds) {
+        seeds = new PriceSeed[](2);
+        seeds[0] = PriceSeed({
+            question: "Will BTC trade >= $75,000 at expiry (Mezo PriceFeed)?",
+            description: "Objective oracle market settled permissionlessly via Mezo PriceFeed.fetchPrice() at or after expiry. Resolves YES if BTC/USD >= $75,000.",
+            duration: 14 days,
+            liquidity: 500 ether,
+            strikePrice: 75_000 ether,
+            resolveAbove: true
         });
-        seeds[1] = Seed({
-            question: "Will Mezo process more than 1M transactions this week?",
-            description: "Resolves YES if the Mezo testnet explorer reports more than 1,000,000 transactions in the calendar week.",
-            category: "Mezo",
+        seeds[1] = PriceSeed({
+            question: "Will BTC drop below $70,000 within 7 days (Mezo PriceFeed)?",
+            description: "Objective oracle market settled permissionlessly via Mezo PriceFeed.fetchPrice() at or after expiry. Resolves YES if BTC/USD < $70,000.",
             duration: 7 days,
+            liquidity: 400 ether,
+            strikePrice: 70_000 ether,
+            resolveAbove: false
+        });
+    }
+
+    function _manualSeeds() internal pure returns (ManualSeed[] memory seeds) {
+        seeds = new ManualSeed[](4);
+        seeds[0] = ManualSeed({
+            question: "Will Mezo Testnet cross 5,000 active Troves this month?",
+            description: "Subjective ecosystem milestone resolved by market creator against public Mezo explorer Trove stats at expiry.",
+            category: "Mezo",
+            duration: 21 days,
             liquidity: 300 ether
         });
-        seeds[2] = Seed({
-            question: "Will ETH flip BTC market cap this quarter?",
-            description: "Resolves YES if Ethereum's market capitalisation exceeds Bitcoin's on any single day before the quarter ends.",
-            category: "Crypto",
-            duration: 60 days,
-            liquidity: 700 ether
-        });
-        seeds[3] = Seed({
-            question: "Will a Bitcoin ETF see net inflows for 5 straight days?",
-            description: "Resolves YES if spot Bitcoin ETFs record positive net inflows on five consecutive trading days before the deadline.",
-            category: "Crypto",
-            duration: 14 days,
+        seeds[1] = ManualSeed({
+            question: "Will MUSD total supply exceed 100M across Mezo deployments?",
+            description: "Resolves YES if canonical MUSD minted supply exceeds 100,000,000 MUSD before the market end timestamp.",
+            category: "Mezo",
+            duration: 30 days,
             liquidity: 400 ether
         });
-        seeds[4] = Seed({
-            question: "Will the next Mezo hard fork ship before December?",
-            description: "Resolves YES if the Mezo core team publishes a hard fork release before 1 December.",
-            category: "Mezo",
-            duration: 45 days,
-            liquidity: 300 ether
+        seeds[2] = ManualSeed({
+            question: "Will a Bitcoin spot ETF record 5 consecutive days of inflows this month?",
+            description: "Resolves YES if spot Bitcoin ETFs post positive net inflows on five consecutive US trading days before expiry.",
+            category: "Crypto",
+            duration: 14 days,
+            liquidity: 350 ether
         });
-        seeds[5] = Seed({
-            question: "Will Annex's first demo market resolve YES?",
-            description: "A short market created to show the full lifecycle on camera: trade, resolve, redeem. Resolves YES once the demo trades are recorded.",
+        seeds[3] = ManualSeed({
+            question: "Will Annex Wave 2 demo settlement market resolve YES?",
+            description: "Short-lived lifecycle demonstration market resolved YES by the creator once Wave 2 verification trades finish.",
             category: "Other",
             duration: 30 minutes,
             liquidity: 200 ether
