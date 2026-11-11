@@ -116,14 +116,14 @@
         </div>
         <h1>Trade the outcome<br /><span class="grad">of anything.</span></h1>
         <p class="lede" style="margin-top: 22px">
-          Permissionless binary prediction markets on Mezo. Anyone can create a yes/no market,
-          trade YES or NO against an on-chain constant-product AMM, and redeem winning shares
+          Permissionless binary prediction markets on Mezo. Open a Trove in-app to mint MUSD,
+          trade BTC PriceFeed or event markets via an on-chain AMM, and redeem winning shares
           1:1 for MUSD.
         </p>
-        <div style="margin-top: 26px; display: flex; gap: 10px;">
+        <div style="margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap;">
           <span class="pill">Mezo Testnet · 31611</span>
-          <span class="pill">Settled in MUSD</span>
-          <span class="pill">Gas in BTC</span>
+          <span class="pill">In-App Troves + PriceFeed</span>
+          <span class="pill">0.30% Isolated Fee</span>
           <span class="pill">Non-custodial</span>
         </div>
         <div class="foot"><span>annex-markets.vercel.app</span><span>github.com/Ryjen1/Annex</span></div>
@@ -136,14 +136,14 @@
       <div class="inner">
         <div class="brand"><span>Annex</span></div>
         <div class="eyebrow">The problem</div>
-        <h2 style="margin-top: 14px;">People already bet on outcomes.<br /><span class="grad">The venues do not fit.</span></h2>
+        <h2 style="margin-top: 14px;">People already trade on outcomes.<br /><span class="grad">The venues do not fit.</span></h2>
         <div class="grid-2">
           <div class="card"><h3>Offshore and custodial</h3><p>Funds sit with an operator, not in a contract you can verify.</p></div>
-          <div class="card"><h3>Hard to reach</h3><p>A Bitcoin-native user needs a separate chain, a bridge, and a stablecoin they do not hold.</p></div>
-          <div class="card"><h3>Opaque</h3><p>A proprietary order book and a private risk engine. You cannot check that a market is solvent.</p></div>
-          <div class="card"><h3>No Bitcoin rails</h3><p>Bitcoin has the money, the users and the finality — and no venue for collective opinion.</p></div>
+          <div class="card"><h3>Disjointed stablecoin UX</h3><p>Plain ERC-20 apps force Bitcoin users off-app to bridge or open a CDP Trove elsewhere before trading.</p></div>
+          <div class="card"><h3>Opaque risk</h3><p>A proprietary order book and private risk engine hide whether the market is truly solvent.</p></div>
+          <div class="card"><h3>Manual BTC reliance</h3><p>Objective BTC/USD strike markets should settle from canonical on-chain feeds, not human resolvers.</p></div>
         </div>
-        <div class="foot"><span>Annex — Mezo Buildathon</span><span>02</span></div>
+        <div class="foot"><span>Annex — Mezo Buildathon (Wave 2)</span><span>02</span></div>
       </div>
     </section>
 
@@ -152,19 +152,19 @@
       <div class="grid"></div><div class="bloom"></div>
       <div class="inner">
         <div class="brand"><span>Annex</span></div>
-        <div class="eyebrow">The solution</div>
-        <h2 style="margin-top: 14px;">A prediction market protocol that runs<br /><span class="grad">natively on Mezo.</span></h2>
-        <ul style="margin-top: 30px;">
-          <li><b>Any wallet</b> can create a yes/no market in one transaction.</li>
-          <li>An <b>on-chain constant-product AMM</b> prices the two sides and settles every trade.</li>
-          <li>The winner redeems <b>1:1 for MUSD</b>, a Bitcoin-backed stablecoin.</li>
-          <li>Everything is verifiable on-chain: <b>no operator, no order book, no off-chain component</b>.</li>
+        <div class="eyebrow">The solution · Wave 2 L3+ Integration</div>
+        <h2 style="margin-top: 14px;">A prediction market protocol wired<br /><span class="grad">into Mezo's core stack.</span></h2>
+        <ul style="margin-top: 28px;">
+          <li><b>In-app Trove funding:</b> open or top up a Mezo Trove via <b>BorrowerOperations</b> with live ICR and liquidation price from <b>TroveManager</b>.</li>
+          <li><b>Dual-path markets:</b> BTC/USD strikes settle permissionlessly via <b>Mezo PriceFeed</b>; custom events stay <b>Manual</b>.</li>
+          <li><b>Transparent 0.30% entry fee:</b> isolated protocol revenue with <b>1:1 MUSD settlement</b> and <b>0% exit tax</b>.</li>
+          <li><b>Zero operator risk:</b> immutable contract, non-custodial pools, and <b>no off-chain pricing</b>.</li>
         </ul>
         <div class="stat-row">
-          <div class="stat"><div class="label">Markets live</div><div class="v grad">7</div></div>
-          <div class="stat"><div class="label">Pool</div><div class="v">2.6K MUSD</div></div>
+          <div class="stat"><div class="label">Integration</div><div class="v grad">L3+</div></div>
+          <div class="stat"><div class="label">Entry fee</div><div class="v">0.30%</div></div>
           <div class="stat"><div class="label">Contract</div><div class="v">1</div></div>
-          <div class="stat"><div class="label">Tests</div><div class="v">51</div></div>
+          <div class="stat"><div class="label">Tests</div><div class="v">65</div></div>
         </div>
         <div class="foot"><span>annex-markets.vercel.app</span><span>03</span></div>
       </div>
@@ -175,31 +175,31 @@
       <div class="grid"></div><div class="bloom"></div>
       <div class="inner">
         <div class="brand"><span>Annex</span></div>
-        <div class="eyebrow">How the AMM works</div>
-        <h2 style="margin-top: 14px;">The quote <span class="grad">is</span> the price you pay.</h2>
+        <div class="eyebrow">AMM & Fee Economics</div>
+        <h2 style="margin-top: 14px;">Honest pricing, <span class="grad">clean revenue.</span></h2>
         <div class="grid-2" style="grid-template-columns: 1.15fr 0.85fr;">
           <div class="code">
-buy YES with a MUSD<br />
-&nbsp;&nbsp;└─► split a into a complete set: a YES + a NO<br />
-&nbsp;&nbsp;&nbsp;&nbsp;├─ the NO half becomes counter-collateral<br />
-&nbsp;&nbsp;&nbsp;&nbsp;└─ the pool releases YES (k preserved)<br /><br />
-buyer receives &nbsp;a + swapOut YES shares<br />
-priceYes = reserveNo / (reserveYes + reserveNo)
+buyShares YES with gross MUSD<br />
+&nbsp;&nbsp;├─ 0.30% fee (30 bps) ──► accruedFees (owner claim)<br />
+&nbsp;&nbsp;└─ net splits into complete set: net YES + net NO<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ NO half becomes counter-collateral<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ pool releases YES (k preserved)<br /><br />
+buyer receives &nbsp;net + swapOut YES · winner redeems 1:1
           </div>
           <div>
             <ul style="margin-top: 4px;">
-              <li><b>Exact solvency</b> — every MUSD deposited mints exactly one YES and one NO.</li>
-              <li><b>Honest pricing</b> — the marginal cost is the quoted cost, plus ordinary slippage.</li>
-              <li><b>The spread is the business</b> — the liquidity provider earns it, openly.</li>
+              <li><b>Exact collateralization</b> — every net MUSD mints 1 YES + 1 NO.</li>
+              <li><b>Entry fee, 0% exit fee</b> — winning shares always redeem at 1.00 MUSD par.</li>
+              <li><b>LP spreads preserved</b> — creator LPs earn pool trade spreads at settlement.</li>
             </ul>
             <div class="card" style="margin-top: 18px;">
-              <div class="label">Live on market #0</div>
-              <div class="num" style="margin-top: 6px;">25 MUSD → 41.67 YES</div>
-              <p style="margin-top: 4px;">Average execution 60.00¢ · price impact 3.32%</p>
+              <div class="label">Pre-trade disclosure (100 MUSD buy)</div>
+              <div class="num" style="margin-top: 6px;">0.30 MUSD fee · 99.70 net</div>
+              <p style="margin-top: 4px;">Itemized fee, swap shares, avg price &amp; 1:1 win payout before signing.</p>
             </div>
           </div>
         </div>
-        <div class="foot"><span>Annex — Mezo Buildathon</span><span>04</span></div>
+        <div class="foot"><span>Annex — Mezo Buildathon (Wave 2)</span><span>04</span></div>
       </div>
     </section>
 
@@ -208,18 +208,18 @@ priceYes = reserveNo / (reserveYes + reserveNo)
       <div class="grid"></div><div class="bloom"></div>
       <div class="inner">
         <div class="brand"><span>Annex</span></div>
-        <div class="eyebrow">Why it is safe</div>
+        <div class="eyebrow">Solvency & Yield Safety</div>
         <h2 style="margin-top: 14px;">The invariant <span class="grad">is</span> the product.</h2>
-        <div class="code" style="margin-top: 28px; text-align: center; font-size: 21px; letter-spacing: 0.02em;">
-totalCollateral&nbsp;&nbsp;==&nbsp;&nbsp;totalYes&nbsp;&nbsp;==&nbsp;&nbsp;totalNo
+        <div class="code" style="margin-top: 24px; text-align: center; font-size: 18px; letter-spacing: 0.01em;">
+MUSD.balanceOf(this) == totalLockedCollateral + accruedFees &nbsp;|&nbsp; locked == totalYes == totalNo
         </div>
         <div class="grid-3">
-          <div class="card"><h3>No admin path</h3><p>No withdrawal function, no upgrade key, no admin pricing, no oracle.</p></div>
-          <div class="card"><h3>Permissioned resolution</h3><p>Only the market's resolver or the protocol owner can settle it.</p></div>
-          <div class="card"><h3>Proven by tests</h3><p>51 Foundry tests: unit, fuzz, reentrancy, full lifecycle, invariants.</p></div>
+          <div class="card"><h3>Strict Fee Isolation</h3><p><code>claimFees()</code> withdraws <code>accruedFees</code> only — locked market collateral can never be touched.</p></div>
+          <div class="card"><h3>Oracle &amp; Yield Guards</h3><p>Manual resolves revert on PriceFeed markets. Idle StabilityPool yield is deferred so withdrawals never lock.</p></div>
+          <div class="card"><h3>65 Foundry Tests</h3><p>51 Wave 1 regression + invariant tests plus 14 Wave 2 PriceFeed, fee isolation, Trove &amp; fuzz tests.</p></div>
         </div>
-        <p class="body" style="margin-top: 24px;">
-          You do not have to trust an operator's risk engine — you read it off the contract.
+        <p class="body" style="margin-top: 22px;">
+          Idle-pool yield was evaluated and deliberately deferred until atomic sMUSD liquidity ensures 1:1 redemption liveness.
         </p>
         <div class="foot"><span>annex-markets.vercel.app</span><span>05</span></div>
       </div>
@@ -230,15 +230,15 @@ totalCollateral&nbsp;&nbsp;==&nbsp;&nbsp;totalYes&nbsp;&nbsp;==&nbsp;&nbsp;total
       <div class="grid"></div><div class="bloom"></div>
       <div class="inner">
         <div class="brand"><span>Annex</span></div>
-        <div class="eyebrow">The demo — 90 seconds</div>
-        <h2 style="margin-top: 14px;">Connect. Trade. Resolve. <span class="grad">Redeem.</span></h2>
-        <div class="grid-2" style="grid-template-columns: repeat(2, 1fr); margin-top: 28px;">
-          <div class="card"><div class="num">01</div><h3 style="margin-top: 6px;">Connect</h3><p>A Bitcoin wallet (Unisat, Xverse, OKX) or any injected EVM wallet.</p></div>
-          <div class="card"><div class="num">02</div><h3 style="margin-top: 6px;">Create</h3><p>Question, resolution criteria, close date, 1,000 MUSD of liquidity. You become the LP.</p></div>
-          <div class="card"><div class="num">03</div><h3 style="margin-top: 6px;">Trade</h3><p>Buy 25 MUSD of YES at a live quote. The pool price moves immediately.</p></div>
-          <div class="card"><div class="num">04</div><h3 style="margin-top: 6px;">Settle</h3><p>The resolver posts the outcome; winning shares redeem 1:1 in MUSD.</p></div>
+        <div class="eyebrow">The Wave 2 Demo — 120 seconds</div>
+        <h2 style="margin-top: 14px;">Mint. Create. Trade. <span class="grad">Redeem.</span></h2>
+        <div class="grid-2" style="grid-template-columns: repeat(2, 1fr); margin-top: 26px;">
+          <div class="card"><div class="num">01</div><h3 style="margin-top: 6px;">Connect</h3><p>Bitcoin wallet (Xverse, Unisat, OKX) or injected EVM wallet via Mezo Passport.</p></div>
+          <div class="card"><div class="num">02</div><h3 style="margin-top: 6px;">Mint MUSD In-App</h3><p>Open or top up a Trove on <code>/trove</code> via BorrowerOperations with live ICR &amp; liq price.</p></div>
+          <div class="card"><div class="num">03</div><h3 style="margin-top: 6px;">Trade with Fee Quote</h3><p>Pick a BTC PriceFeed or Manual market, inspect 0.30% fee &amp; shares, and swap MUSD.</p></div>
+          <div class="card"><div class="num">04</div><h3 style="margin-top: 6px;">Settle &amp; Redeem 1:1</h3><p>Call permissionless <code>resolvePriceMarket</code>, redeem 1:1 MUSD, claim LP &amp; isolated fees.</p></div>
         </div>
-        <p class="body" style="margin-top: 22px;">No registration, no deposit address, no support ticket.</p>
+        <p class="body" style="margin-top: 20px;">From raw BTC to prediction trade and 1:1 settlement — zero external dApp hops.</p>
         <div class="foot"><span>annex-markets.vercel.app</span><span>06</span></div>
       </div>
     </section>
@@ -248,22 +248,22 @@ totalCollateral&nbsp;&nbsp;==&nbsp;&nbsp;totalYes&nbsp;&nbsp;==&nbsp;&nbsp;total
       <div class="grid"></div><div class="bloom"></div>
       <div class="inner">
         <div class="brand"><span>Annex</span></div>
-        <div class="eyebrow">What is built today</div>
-        <h2 style="margin-top: 14px;">Shipped on <span class="grad">Mezo Testnet.</span></h2>
+        <div class="eyebrow">What is built in Wave 2</div>
+        <h2 style="margin-top: 14px;">Built for <span class="grad">Mezo Testnet.</span></h2>
         <table>
           <thead><tr><th>Piece</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>Core contract (create / trade / resolve / redeem / LP claim)</td><td class="ok">done — live on testnet</td></tr>
-            <tr><td>AMM with exact solvency and honest marginal pricing</td><td class="ok">done — 51 tests green</td></tr>
-            <tr><td>Frontend: landing, markets, detail, live price curve, create, portfolio</td><td class="ok">done — live</td></tr>
-            <tr><td>Deploy + seed scripts, public repo, docs, deck</td><td class="ok">done</td></tr>
+            <tr><td>In-app Trove funding (<code>BorrowerOperations</code> + <code>TroveManager</code> + hints)</td><td class="ok">done — /trove + drawers</td></tr>
+            <tr><td>Dual resolution (<code>PriceFeed</code> BTC markets vs <code>Manual</code> events)</td><td class="ok">done — audited &amp; guarded</td></tr>
+            <tr><td><code>0.30%</code> entry protocol fee + <code>claimFees</code> collateral isolation</td><td class="ok">done — 65 tests green</td></tr>
+            <tr><td>Frontend (React 18 / Passport / Curve), scripts, deck &amp; docs</td><td class="ok">done — fork E2E verified</td></tr>
           </tbody>
         </table>
         <div class="stat-row">
-          <div class="stat"><div class="label">Contract</div><div class="v" style="font-size: 15px; font-family: 'JetBrains Mono', monospace;">0xfdbfde0a…5a501d</div></div>
+          <div class="stat"><div class="label">Wave 1 Legacy</div><div class="v" style="font-size: 14px; font-family: 'JetBrains Mono', monospace;">0xfdbfde0a…5a501d</div></div>
+          <div class="stat"><div class="label">Wave 2 Status</div><div class="v" style="font-size: 20px;">Deploy Ready</div></div>
+          <div class="stat"><div class="label">Tests</div><div class="v">65 / 65</div></div>
           <div class="stat"><div class="label">Chain</div><div class="v">31611</div></div>
-          <div class="stat"><div class="label">Settlement</div><div class="v">MUSD</div></div>
-          <div class="stat"><div class="label">Gas</div><div class="v">BTC</div></div>
         </div>
         <div class="foot"><span>github.com/Ryjen1/Annex</span><span>07</span></div>
       </div>
@@ -277,9 +277,9 @@ totalCollateral&nbsp;&nbsp;==&nbsp;&nbsp;totalYes&nbsp;&nbsp;==&nbsp;&nbsp;total
         <div class="eyebrow">Roadmap</div>
         <h2 style="margin-top: 14px;">Bitcoin-native markets for<br /><span class="grad">every measurable claim.</span></h2>
         <div class="grid-3">
-          <div class="card"><div class="label">Wave 1</div><h3 style="margin-top: 6px;">More liquidity</h3><p>Transferable LP shares so anyone can provide liquidity, plus a price-history chart per market.</p></div>
-          <div class="card"><div class="label">Wave 2</div><h3 style="margin-top: 6px;">More outcomes</h3><p>Multi-outcome markets beyond yes/no, and optional oracle resolution a creator can point at.</p></div>
-          <div class="card"><div class="label">Beyond</div><h3 style="margin-top: 6px">Settlement that asks nobody</h3><p>A venue for collective opinion on Bitcoin rails, with settlement you can read off the bytecode.</p></div>
+          <div class="card"><div class="label">Wave 2 Shipped</div><h3 style="margin-top: 6px;">L3+ Integration</h3><p>In-app Mezo Troves, BTC PriceFeed settlement, 0.30% isolated fee &amp; deferred yield proof.</p></div>
+          <div class="card"><div class="label">Wave 2 Launch</div><h3 style="margin-top: 6px;">Live Rollout</h3><p>Deploy &amp; Blockscout-verify Wave 2 contract, redeploy frontend, external user testing &amp; demo cut.</p></div>
+          <div class="card"><div class="label">Beyond</div><h3 style="margin-top: 6px;">Mainnet Scale</h3><p>Atomic sMUSD yield routing, transferable ERC-20 LP positions &amp; per-market activity charts.</p></div>
         </div>
         <div style="margin-top: 34px; display: flex; align-items: center; gap: 18px;">
           <div>
@@ -288,8 +288,8 @@ totalCollateral&nbsp;&nbsp;==&nbsp;&nbsp;totalYes&nbsp;&nbsp;==&nbsp;&nbsp;total
           </div>
           <div style="width: 1px; height: 48px; background: rgba(255,255,255,0.12);"></div>
           <div>
-            <div class="label">Contract</div>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 15px; margin-top: 10px; color: rgba(255,255,255,0.6);">0xfdbfde0a430de94c1d862cfc290c36549b5a501d</div>
+            <div class="label">Repository</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 16px; margin-top: 10px; color: rgba(255,255,255,0.6);">github.com/Ryjen1/Annex</div>
           </div>
         </div>
         <div class="foot"><span>Annex — permissionless prediction markets on Mezo, settled in MUSD</span><span>08</span></div>

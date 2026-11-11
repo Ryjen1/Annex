@@ -1,4 +1,4 @@
-# Annex — Pitch Deck
+# Annex — Pitch Deck (Wave 2)
 
 > 8 slides. Kept deliberately short: the demo does the talking.
 > Product name is **Annex**, everywhere. No external project names anywhere.
@@ -10,131 +10,114 @@
 **Annex**
 Permissionless binary prediction markets, settled in MUSD on Mezo.
 
-Create a market about anything. Trade YES or NO. Redeem 1:1 when it resolves.
-Non-custodial, one contract, gas paid in BTC.
+Open a Trove in-app, trade YES or NO on BTC PriceFeed or custom event markets via an on-chain
+AMM, and redeem winning shares 1:1 for MUSD. Non-custodial, one contract, gas paid in BTC.
 
-`mezotestnet · 31611`
+`Mezo Testnet · 31611 · Wave 2 L3+ Integration`
 
 ---
 
 ## 2 — The problem
 
-People already bet on outcomes — sports, elections, crypto prices, headlines. But the places
-where they do it are:
+People already bet on outcomes — crypto prices, elections, macro events. Existing venues fail
+Bitcoin users in four ways:
 
-- **Offshore and custodial.** Funds sit with an operator, not in a contract you can verify.
-- **Hard to reach.** A Bitcoin-native user needs a separate chain, a bridge, and a stablecoin
-  they do not hold.
-- **Opaque.** A proprietary order book and a private risk engine. You cannot check that the
-  market is solvent.
-
-There is no market infrastructure on Bitcoin rails. Bitcoin has the money, the users and the
-finality — and no venue for collective opinion.
+- **Offshore & custodial.** Funds sit with an operator, not in bytecode you can audit.
+- **Disjointed stablecoin UX.** Even on Bitcoin EVMs, plain ERC-20 apps force users to leave
+  the product to open a CDP Trove elsewhere before funding a single trade.
+- **Opaque risk.** Proprietary order books and private settlement engines hide insolvency.
+- **Unpriced BTC finality.** Objective BTC/USD markets shouldn't rely on opaque manual settles
+  when canonical on-chain price feeds exist.
 
 ---
 
-## 3 — The solution
+## 3 — The solution (Wave 2 L3+ Architecture)
 
-**Annex is a prediction market protocol that runs natively on Mezo, a Bitcoin EVM.**
+**Annex is a Bitcoin-native prediction market wired directly into Mezo's DeFi stack.**
 
-- Any wallet can create a yes/no market in one transaction.
-- An on-chain constant-product AMM prices the two sides and settles every trade.
-- The winner redeems 1:1 for **MUSD**, a Bitcoin-backed stablecoin.
-- Everything is verifiable on-chain. There is no operator, no order book, no off-chain
-  component.
-
-**The pitch in one line:** a market maker in your pocket, with a settlement guarantee you can
-read in the bytecode.
+- **In-app Mezo Trove funding (`/trove` & trade drawer):** Users open Troves, add BTC,
+  refinance capacity, and borrow MUSD directly via `BorrowerOperations`, with live ICR and
+  liquidation price from `TroveManager` + `PriceFeed`.
+- **Dual-path resolution:** Objective BTC/USD strike markets (`MarketKind.PriceFeed`) settle
+  permissionlessly from Mezo `PriceFeed.fetchPrice()`; subjective events stay `MarketKind.Manual`.
+- **Sustainable revenue:** `0.30%` (`30 bps`) protocol entry fee isolated from `totalLockedCollateral`.
+- **Verified execution:** 1 immutable contract · 65 Foundry tests · zero proxy/admin sweep.
 
 ---
 
-## 4 — How the AMM works
+## 4 — AMM & Fee Economics
 
-Each market holds a pool of YES and NO shares with a constant product `x · y = k`.
+Each market holds a pool of YES and NO shares with constant product `x · y = k`.
 
 ```
-buy YES with a MUSD
-  └─► split a into a complete set:  a YES + a NO
-        ├─ the NO half becomes counter-collateral in the pool
-        └─ the pool releases YES to the buyer  (k preserved)
+buy YES with grossAmount MUSD
+  ├─ 0.30% protocol fee (30 bps) ──► accruedFees (owner-claimable revenue)
+  └─ netAmount splits into complete set:  netAmount YES + netAmount NO
+        ├─ NO half stays in pool as counter-collateral
+        └─ pool releases YES  (k preserved)
 
-buyer receives  a + swapOut  YES shares
+buyer receives  netAmount + swapOut  YES shares
+winner redeems  1.00 MUSD / share  (0% exit fee)
 ```
 
-**The price is honest.** `priceYes = reserveNo / (reserveYes + reserveNo)` is not a display
-number — it is the true marginal cost of a share. The price a trader sees is the price they
-pay, plus normal slippage.
-
-**The spread is the business.** The liquidity provider earns the difference between the
-pre-trade and post-trade price. The trader pays slippage, not a hidden markup.
+- **Honest pricing:** `priceYes = reserveNo / (reserveYes + reserveNo)` plus disclosed impact.
+- **Entry fee, 0% exit tax:** Winners always redeem 1:1 at par; LPs earn pool trading spreads.
+- **No hidden collateral drag:** `claimFees()` only withdraws `accruedFees`, never market reserves.
 
 ---
 
-## 5 — Why it is safe
+## 5 — Why it is safe (Solvency & Deferred Yield)
 
 ```
-totalCollateral  ==  totalYes  ==  totalNo
+MUSD.balanceOf(AnnexMarket)  ==  totalLockedCollateral + accruedFees
+totalLockedCollateral        ==  totalYes  ==  totalNo
 ```
 
-Every MUSD deposited mints exactly one YES and one NO share. So whichever side wins, every
-winning share is backed 1:1 by MUSD — and after resolution the entire collateral is
-distributed. Nothing is stranded, nothing is borrowed.
-
-Plus:
-
-- No withdrawal function, no upgrade key, no admin pricing.
-- Resolution is permissioned to the market's resolver or the protocol owner — and nothing else.
-- Reentrancy-guarded entry points, fuzz-tested invariants, 51 passing tests.
-
-**The invariant is the product.** You do not have to trust the operator's risk engine; you
-read it off the contract.
+- **Zero custody & strict isolation:** No proxy, no upgrade key, no `withdraw` of collateral,
+  and `claimFees()` strictly bounded by `accruedFees`.
+- **Dual resolution guardrails:** `resolve()` and `setResolver()` revert on `PriceFeed`
+  markets (`PriceFeedMarketOnly`); price reads enforce `MAX_PRICE_STALENESS = 1 hour`.
+- **Why idle yield is explicitly deferred:** Auditing `StabilityPool.sol` confirmed withdrawals
+  lock during undercollateralized troves and `offset()` swaps MUSD for BTC. Keeping resting
+  collateral inside `AnnexMarket` guarantees 100% 1:1 MUSD redemption liveness.
+- **65 Foundry tests:** All 51 Wave 1 tests (incl. 4 AMM regression tests) + 14 Wave 2 tests.
 
 ---
 
-## 6 — The demo (90 seconds)
+## 6 — The Wave 2 Demo (120 seconds)
 
-1. **Connect** a Bitcoin wallet (Unisat, Xverse, OKX) or any injected EVM wallet.
-2. **Create** a market: question, resolution criteria, close date, 1,000 MUSD of liquidity.
-   You become the liquidity provider.
-3. **Trade.** Buy 100 MUSD of YES at 50¢ → receive ~190 YES shares. The price moves to ~55¢.
-   The LP position is worth more than you put in — that is the spread.
-4. **Resolve** at the close. The resolver posts the outcome.
-5. **Redeem.** Winning shares pay 1:1 in MUSD. The LP claims the rest of the pool.
-
-No registration, no deposit address, no support ticket.
+1. **Connect** a Bitcoin wallet (Xverse, Unisat, OKX) or EVM wallet via Mezo Passport.
+2. **Mint MUSD in-app (`/trove`)** — inspect live BTC price, ICR, and liquidation price via
+   `TroveManager`, then `openTrove` / `addColl` / borrow MUSD through `BorrowerOperations`.
+3. **Create & trade** a `BTC/USD PriceFeed` or `Manual` market; inspect the pre-trade
+   breakdown (`Order total`, `0.30% protocol fee`, `Net into AMM`, `1:1 win payout`).
+4. **Settle & redeem** — call permissionless `resolvePriceMarket()` after expiry, redeem
+   winning shares `1:1 MUSD`, claim LP surplus, and show `claimFees()` leaves collateral intact.
 
 ---
 
-## 7 — What is built today
+## 7 — What is built today (Wave 2)
 
 | Piece | Status |
 |---|---|
-| Core contract (`AnnexMarket`) | done — create / trade / resolve / redeem / LP claim |
-| AMM | done — constant product, exact solvency, honest marginal pricing |
-| Test suite | done — 51 tests: unit, fuzz, reentrancy, full lifecycle |
-| Deploy + seed scripts | done — verified on a local node |
-| Frontend | done — markets, market detail, trade, create, portfolio |
-| Docs | done — README + architecture notes |
+| `AnnexMarket.sol` Wave 2 (`PriceFeed`, `TroveManager`, `30 bps` fee) | Done — audited & tested |
+| In-app Trove funding (`BorrowerOperations` + `HintHelpers` + `SortedTroves`) | Done — `/trove` + inline drawers |
+| Foundry suite (`AnnexMarket.t.sol` + `AnnexMarketWave2.t.sol`) | Done — 65 / 65 passing |
+| Mezo Testnet fork E2E + deploy/seed/Blockscout verify scripts | Done — ready for broadcast |
+| Frontend (`Vite` + `React 18` + `Tailwind` + `Passport`) + Wave 2 docs/deck | Done — 0 lint/type warnings |
 
-**Next:** deploy to Mezo Testnet, open the first user-funded markets, publish the market
-list, and open LP positions to secondary providers.
+`Chain: Mezo Testnet (31611) · Wave 1 legacy: 0xfdbfde0a…5a501d · Settlement: MUSD · Gas: BTC`
 
 ---
 
 ## 8 — Roadmap
 
-**Wave 1 (now)**
-- Deploy to Mezo Testnet, seed markets, onboard the first traders.
-- LP shares become transferable — anyone can provide liquidity.
-- Price history chart per market.
-
-**Wave 2**
-- Multi-outcome markets (any number of buckets, not just yes/no).
-- Oracles: a resolution source that a market creator can point at instead of a person.
-- Fee switch that routes the spread to a treasury.
-
-**The long game:** a Bitcoin-native market for every measurable claim, with settlement that
-does not ask anybody for permission.
+- **Wave 2 Shipped (Now):** In-app Mezo Trove funding (L3+), BTC/USD `PriceFeed` settlement,
+  isolated `0.30%` fee, StabilityPool deferral proof, 65 tests.
+- **Wave 2 Launch (Next):** Broadcast Wave 2 contract on Mezo Testnet, Blockscout explorer
+  verification, live Vercel update, external trader transactions, Wave 2 walkthrough video.
+- **Mainnet & Beyond:** Atomic `sMUSD` idle-collateral yield once live on Mezo, transferable
+  ERC-20 LP positions, per-market OHLC/activity charts, multi-outcome Bitcoin macro pools.
 
 ---
 
