@@ -8,9 +8,16 @@ import { Landing } from './pages/Landing'
 import { MarketDetail } from './pages/MarketDetail'
 import { Markets } from './pages/Markets'
 import { Portfolio } from './pages/Portfolio'
+import { Trove } from './pages/Trove'
 import { BitcoinIcon } from './components/icons'
+import { explorerAddress } from './lib/chains'
+import { ANNEX_ADDRESS, isDeployed } from './lib/contracts'
 
 export default function App() {
+  const contractUrl = explorerAddress(
+    isDeployed ? ANNEX_ADDRESS : '0xfdbfde0a430de94c1d862cfc290c36549b5a501d',
+  )
+
   return (
     <div className="relative flex min-h-screen flex-col">
       <Background />
@@ -19,6 +26,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/markets" element={<Markets />} />
+          <Route path="/trove" element={<Trove />} />
           <Route path="/market/:id" element={<MarketDetail />} />
           <Route path="/create" element={<CreateMarket />} />
           <Route path="/portfolio" element={<Portfolio />} />
@@ -36,7 +44,7 @@ export default function App() {
               Non-custodial · on-chain AMM · gas in BTC
             </span>
             <a
-              href="https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d"
+              href={contractUrl}
               target="_blank"
               rel="noreferrer"
               className="transition-colors hover:text-white"

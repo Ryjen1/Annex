@@ -10,18 +10,18 @@ import { useNow } from '../hooks/useNow'
 const FEATURES = [
   {
     icon: LayersIcon,
-    title: 'Create a market',
-    body: 'Post any yes/no question with your own resolution criteria. One transaction seeds a balanced pool and you become the first liquidity provider.',
+    title: 'Borrow MUSD in a Trove',
+    body: 'Open or top up a Bitcoin-backed Trove via Mezo BorrowerOperations directly inside Annex, with live collateral ratio and liquidation price from TroveManager.',
   },
   {
     icon: BoltIcon,
     title: 'Trade on chain',
-    body: 'Buy YES or NO from a constant-product AMM priced by the pool itself. The quote you see is the marginal price — no order book, no operator.',
+    body: 'Buy YES or NO from a constant-product AMM with an explicit 0.30% entry fee separated from pool collateral. Launch BTC/USD markets settled by Mezo PriceFeed or custom events.',
   },
   {
     icon: ShieldIcon,
-    title: 'Settle in MUSD',
-    body: 'Winning shares redeem 1:1 for MUSD, Bitcoin-backed and fully on-chain. Every MUSD deposited is provably collateralised by the pool.',
+    title: 'Settle 1:1 in MUSD',
+    body: 'Winning shares redeem strictly 1:1 for MUSD with zero exit fee. Every MUSD deposited is provably collateralised by the market pool.',
   },
 ]
 
@@ -63,6 +63,12 @@ export function Landing() {
               >
                 Explore markets
                 <ArrowUpRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/trove"
+                className="btn-ghost inline-flex items-center gap-2 px-7 py-3.5 text-[15px]"
+              >
+                Open Mezo Trove
               </Link>
               <Link
                 to="/create"

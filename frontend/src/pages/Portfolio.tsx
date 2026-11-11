@@ -5,8 +5,9 @@ import { useAccount, usePublicClient, useReadContract, useWriteContract } from '
 
 import { annexMarketAbi } from '../lib/abi'
 import { ANNEX_ADDRESS, MUSD_ADDRESS } from '../lib/contracts'
-import { formatMusd, formatShares } from '../lib/format'
+import { formatBtc, formatMusd, formatRatioPct, formatShares, formatUsdPrice } from '../lib/format'
 import { useMarkets, useUserPositions } from '../hooks/useMarkets'
+import { useTrove } from '../hooks/useTrove'
 import { ArrowUpRight } from '../components/icons'
 
 export function Portfolio() {
@@ -14,6 +15,7 @@ export function Portfolio() {
   const publicClient = usePublicClient()
   const { markets } = useMarkets()
   const { positions } = useUserPositions(address)
+  const trove = useTrove(address)
 
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -104,6 +106,39 @@ export function Portfolio() {
         <Stat label="MUSD balance" value={formatMusd(musdBalance)} />
         <Stat label="Positions" value={String(rows.length)} />
         <Stat label="Shares held" value={formatShares(totalValue)} accent />
+      </div>
+
+      <div className="glass mt-5 flex flex-wrap items-center justify-between gap-4 rounded-3xl px-5 py-4">
+        <div className="flex flex-wrap items-center gap-6 text-xs">
+          <div>
+            <span className="label-caps block text-[10px]">Mezo Trove</span>
+            <span className="mt-1 block font-mono text-sm font-semibold text-white">
+              {trove.isActive ? `${formatBtc(trove.coll)} BTC · ${formatMusd(trove.debt, 0)} MUSD debt` : 'No active Trove'}
+            </span>
+          </div>
+          {trove.isActive && (
+            <>
+              <div>
+                <span className="label-caps block text-[10px]">ICR</span>
+                <span className="mt-1 block font-mono text-sm font-semibold text-annex-green">
+                  {formatRatioPct(trove.icr)}
+                </span>
+              </div>
+              <div>
+                <span className="label-caps block text-[10px]">Liq. Price</span>
+                <span className="mt-1 block font-mono text-sm font-semibold text-annex-orange-soft">
+                  {formatUsdPrice(trove.liquidationPrice)}
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+        <Link
+          to="/trove"
+          className="rounded-full border border-annex-orange/45 bg-annex-orange/10 px-4 py-2 text-xs font-semibold text-annex-orange transition hover:bg-annex-orange/20"
+        >
+          {trove.isActive ? 'Top up Trove' : 'Open Trove for MUSD'}
+        </Link>
       </div>
 
       {error && (

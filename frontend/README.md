@@ -13,8 +13,13 @@ npm run dev
 
 | Env var | Purpose |
 |---|---|
-| `VITE_ANNEX_ADDRESS` | deployed `AnnexMarket` address |
+| `VITE_ANNEX_ADDRESS` | deployed Wave 2 `AnnexMarket` address |
 | `VITE_MUSD_ADDRESS` | settlement token, defaults to canonical Mezo Testnet MUSD |
+| `VITE_BORROWER_OPERATIONS_ADDRESS` | optional override (defaults to `0xCdF7028ceAB81fA0C6971208e83fa7872994beE5`) |
+| `VITE_TROVE_MANAGER_ADDRESS` | optional override (defaults to `0xE47c80e8c23f6B4A1aE41c34837a0599D5D16bb0`) |
+| `VITE_PRICE_FEED_ADDRESS` | optional override (defaults to `0x86bCF0841622a5dAC14A313a15f96A95421b9366`) |
+| `VITE_HINT_HELPERS_ADDRESS` | optional override (`0x4e4c...BCF6`) |
+| `VITE_SORTED_TROVES_ADDRESS` | optional override (`0x722E...68fA`) |
 | `VITE_RPC_URL` | override the RPC URL (e.g. `http://127.0.0.1:8545` for anvil) |
 | `VITE_WALLETCONNECT_PROJECT_ID` | optional; enables the WalletConnect connector |
 
@@ -24,22 +29,28 @@ npm run dev
 src/
 ├── lib/
 │   ├── chains.ts      Mezo Testnet chain definition (multicall3, explorer)
-│   ├── abi.ts         AnnexMarket ABI (generated from the forge output)
-│   ├── contracts.ts   addresses, Outcome enum, categories
-│   ├── format.ts      MUSD / percent / share / countdown formatting
+│   ├── abi.ts         AnnexMarket Wave 2 ABI (generated from forge output)
+│   ├── mezoAbi.ts     Mezo BorrowerOperations, TroveManager, PriceFeed, HintHelpers, SortedTroves ABIs
+│   ├── contracts.ts   verified addresses, Outcome & MarketKind enums, categories
+│   ├── format.ts      MUSD / BTC / USD price / ICR / countdown formatting
 │   └── wagmi.ts       wagmi config via the Mezo Passport wallet list
 ├── hooks/
-│   ├── useMarkets.ts  batched market + position reads
+│   ├── useMarkets.ts  batched market + PriceFeed + position + feeBps reads
+│   ├── usePriceCurve.ts 21-point live curve computed via fee-adjusted quotes
+│   ├── useTrove.ts    live Trove ICR / liq price / HintHelpers lookups
 │   └── useNow.ts      ticking clock for countdowns
 ├── components/
-│   ├── Header.tsx     nav, wallet button, MUSD balance
-│   ├── MarketCard.tsx market card + YES/NO price bar
-│   └── TradePanel.tsx approve → buy, live quote, average price, max payout
+│   ├── Header.tsx            nav (/markets, /trove, /create, /portfolio), wallet button
+│   ├── MarketCard.tsx        market card with PriceFeed/Manual badges + YES/NO bar
+│   ├── TroveFundingPanel.tsx in-app Trove open/top-up/borrow & refinance flow
+│   └── TradePanel.tsx        approve → buy, 0.30% fee disclosure, inline Trove drawer
 └── pages/
-    ├── Markets.tsx      list, category filters, search, pool stats
-    ├── MarketDetail.tsx market info, position, redeem / claim / resolve
-    ├── CreateMarket.tsx create form (approve + create)
-    └── Portfolio.tsx    positions and settlement actions
+    ├── Landing.tsx      hero, featured markets, Trove CTA
+    ├── Trove.tsx        dedicated in-app Mezo Trove & MUSD dashboard
+    ├── Markets.tsx      list, PriceFeed/category filters, search, pool stats
+    ├── MarketDetail.tsx market info, PriceFeed permissionless settle vs Manual resolve, redeem
+    ├── CreateMarket.tsx dual MarketKind (PriceFeed BTC/USD vs Manual) builder + Trove drawer
+    └── Portfolio.tsx    positions, Trove health card, redeem & LP claim actions
 ```
 
 ## Notes

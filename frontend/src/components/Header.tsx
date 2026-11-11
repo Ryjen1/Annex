@@ -11,6 +11,7 @@ import { BitcoinIcon } from './icons'
 const NAV = [
   { to: '/', label: 'Home', end: true },
   { to: '/markets', label: 'Markets' },
+  { to: '/trove', label: 'Trove' },
   { to: '/create', label: 'Create' },
   { to: '/portfolio', label: 'Portfolio' },
 ]
@@ -92,6 +93,14 @@ export function Header() {
             }}
           </ConnectButton.Custom>
         </div>
+      </div>
+
+      <div className="flex items-center justify-center gap-5 border-t border-white/6 px-4 py-2 lg:hidden">
+        {NAV.map((item) => (
+          <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
+            {item.label}
+          </NavLink>
+        ))}
       </div>
     </nav>
   )
