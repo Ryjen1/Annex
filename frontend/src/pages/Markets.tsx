@@ -6,7 +6,7 @@ import { SearchIcon } from '../components/icons'
 import { useMarkets } from '../hooks/useMarkets'
 import { useNow } from '../hooks/useNow'
 
-const FILTERS = ['All', 'BTC Price', 'Mezo', 'Crypto', 'Other']
+const FILTERS = ['All', 'PriceFeed', 'BTC Price', 'Mezo', 'Crypto', 'Other']
 
 export function Markets() {
   const { markets, isLoading } = useMarkets()
@@ -16,7 +16,9 @@ export function Markets() {
 
   const visible = useMemo(() => {
     return markets.filter((market) => {
-      const matchesFilter = filter === 'All' || market.category === filter
+      const matchesFilter =
+        filter === 'All' ||
+        (filter === 'PriceFeed' ? market.kind === 1 : market.category === filter)
       const matchesSearch =
         search.trim() === '' || market.question.toLowerCase().includes(search.trim().toLowerCase())
       return matchesFilter && matchesSearch

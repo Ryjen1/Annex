@@ -6,18 +6,28 @@ import { useAccount, usePublicClient, useReadContract, useWriteContract } from '
 import { PriceBar } from '../components/MarketCard'
 import { TradePanel } from '../components/TradePanel'
 import { annexMarketAbi } from '../lib/abi'
-import { ANNEX_ADDRESS, OUTCOME } from '../lib/contracts'
+import { ANNEX_ADDRESS, MARKET_KIND, OUTCOME, PRICE_FEED_ADDRESS } from '../lib/contracts'
 import { explorerAddress } from '../lib/chains'
-import { formatDate, formatMusd, formatPercent, formatShares, shortAddress, timeLeft } from '../lib/format'
+import {
+  formatDate,
+  formatMusd,
+  formatPercent,
+  formatShares,
+  formatUsdPrice,
+  shortAddress,
+  timeLeft,
+} from '../lib/format'
 import { useMarket } from '../hooks/useMarkets'
 import { useNow } from '../hooks/useNow'
+import { useBtcPrice } from '../hooks/useTrove'
 import { ArrowLeft, ClockIcon, ExternalIcon, ShieldIcon } from '../components/icons'
 
 export function MarketDetail() {
   const { id } = useParams()
   const marketId = id !== undefined ? BigInt(id) : undefined
-  const { market, isLoading } = useMarket(marketId)
+  const { market, isLoading, refetch: refetchMarket } = useMarket(marketId)
   const now = useNow()
+  const { btcPrice } = useBtcPrice()
   const { address } = useAccount()
   const publicClient = usePublicClient()
 
@@ -32,7 +42,7 @@ export function MarketDetail() {
     functionName: 'owner',
   })
 
-  const { data: position } = useReadContract({
+  const { data: position, refetch: refetchPosition } = useReadContract({
     address: ANNEX_ADDRESS,
     abi: annexMarketAbi,
     functionName: 'getUserPosition',
@@ -59,6 +69,7 @@ export function MarketDetail() {
   const noShares = position?.[1] ?? 0n
   const lpShares = position?.[2] ?? 0n
 
+  const isPriceFeedMarket = market.kind === MARKET_KIND.PriceFeed
   const isResolver =
     Boolean(address) &&
     (address?.toLowerCase() === market.resolver.toLowerCase() ||
@@ -66,35 +77,49 @@ export function MarketDetail() {
       (owner && address?.toLowerCase() === owner.toLowerCase()))
 
   const ended = now >= market.endTime
-  const canResolve = isResolver && !market.resolved && (ended || (owner && address?.toLowerCase() === owner.toLowerCase()))
+  const canResolveManual =
+    !isPriceFeedMarket &&
+    isResolver &&
+    !market.resolved &&
+    (ended || (owner && address?.toLowerCase() === owner.toLowerCase()))
+  const canResolveOracle = isPriceFeedMarket && !market.resolved && ended
 
-  async function run(action: 'resolve' | 'redeem' | 'claim', outcome?: number) {
+  async function run(action: 'resolve' | 'resolveOracle' | 'redeem' | 'claim', outcome?: number) {
     if (!publicClient) return
     setStatus('pending')
     try {
       const hash =
-        action === 'resolve'
+        action === 'resolveOracle'
           ? await resolveWrite.writeContractAsync({
               address: ANNEX_ADDRESS,
               abi: annexMarketAbi,
-              functionName: 'resolve',
-              args: [market!.id, outcome ?? OUTCOME.Yes],
+              functionName: 'resolvePriceMarket',
+              args: [market!.id],
             })
-          : action === 'redeem'
-            ? await redeemWrite.writeContractAsync({
+          : action === 'resolve'
+            ? await resolveWrite.writeContractAsync({
                 address: ANNEX_ADDRESS,
                 abi: annexMarketAbi,
-                functionName: 'redeem',
-                args: [market!.id],
+                functionName: 'resolve',
+                args: [market!.id, outcome ?? OUTCOME.Yes],
               })
-            : await claimWrite.writeContractAsync({
-                address: ANNEX_ADDRESS,
-                abi: annexMarketAbi,
-                functionName: 'claimLp',
-                args: [market!.id],
-              })
+            : action === 'redeem'
+              ? await redeemWrite.writeContractAsync({
+                  address: ANNEX_ADDRESS,
+                  abi: annexMarketAbi,
+                  functionName: 'redeem',
+                  args: [market!.id],
+                })
+              : await claimWrite.writeContractAsync({
+                  address: ANNEX_ADDRESS,
+                  abi: annexMarketAbi,
+                  functionName: 'claimLp',
+                  args: [market!.id],
+                })
       await publicClient.waitForTransactionReceipt({ hash })
-      setStatus(action === 'resolve' ? 'resolved' : 'done')
+      refetchMarket()
+      void refetchPosition()
+      setStatus(action === 'resolve' || action === 'resolveOracle' ? 'resolved' : 'done')
     } catch (error) {
       setStatus(error instanceof Error ? error.message.split('\n')[0].slice(0, 120) : 'failed')
     }
@@ -106,7 +131,7 @@ export function MarketDetail() {
     <div className="shell grid gap-6 pb-24 pt-28 md:pt-40 lg:grid-cols-[1fr_400px]">
       <div className="space-y-6">
         <Link
-          to="/"
+          to="/markets"
           className="inline-flex items-center gap-2 text-sm text-white/45 transition-colors hover:text-annex-ink"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -118,6 +143,15 @@ export function MarketDetail() {
             <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
               {market.category || 'General'}
             </span>
+            {isPriceFeedMarket ? (
+              <span className="rounded-full border border-annex-green/30 bg-annex-green/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-annex-green">
+                Mezo PriceFeed Oracle
+              </span>
+            ) : (
+              <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">
+                Manual Resolver
+              </span>
+            )}
             {market.resolved ? (
               <span className="rounded-full border border-annex-orange/30 bg-annex-orange/12 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-annex-orange">
                 Resolved {market.outcome === OUTCOME.Yes ? 'Yes' : 'No'}
@@ -137,6 +171,42 @@ export function MarketDetail() {
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/45">
               {market.description}
             </p>
+          )}
+
+          {isPriceFeedMarket && (
+            <div className="mt-5 grid gap-3 rounded-2xl border border-annex-green/20 bg-annex-green/[0.05] p-4 sm:grid-cols-3">
+              <div>
+                <div className="label-caps text-[10px]">Oracle condition</div>
+                <div className="mt-1 font-mono text-sm font-semibold text-white">
+                  BTC/USD {market.resolveAbove ? '≥' : '<'} {formatUsdPrice(market.strikePrice)}
+                </div>
+              </div>
+              <div>
+                <div className="label-caps text-[10px]">
+                  {market.resolved ? 'Settled BTC price' : 'Live Mezo PriceFeed'}
+                </div>
+                <div className="mt-1 font-mono text-sm font-semibold text-annex-orange-soft">
+                  {market.resolved
+                    ? formatUsdPrice(market.resolvedPrice, 2)
+                    : formatUsdPrice(btcPrice, 2)}
+                </div>
+              </div>
+              <div>
+                <div className="label-caps text-[10px]">Settlement authority</div>
+                <div className="mt-1 text-xs text-white/70">
+                  Permissionless via{' '}
+                  <a
+                    href={explorerAddress(PRICE_FEED_ADDRESS)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-annex-green hover:underline"
+                  >
+                    PriceFeed
+                  </a>{' '}
+                  (no admin override)
+                </div>
+              </div>
+            </div>
           )}
 
           <div className="mt-7">
@@ -163,7 +233,7 @@ export function MarketDetail() {
               }
             />
             <Detail
-              label="Resolver"
+              label={isPriceFeedMarket ? 'Oracle contract' : 'Resolver'}
               value={
                 <a
                   href={explorerAddress(market.resolver)}
@@ -229,7 +299,18 @@ export function MarketDetail() {
                 Claim LP
               </button>
             )}
-            {canResolve && (
+            {canResolveOracle && (
+              <button
+                onClick={() => run('resolveOracle')}
+                disabled={status === 'pending' || !address}
+                className="rounded-full border border-annex-green/50 bg-annex-green/10 px-5 py-2.5 text-sm font-semibold text-annex-green transition-colors hover:bg-annex-green/20 disabled:opacity-50"
+              >
+                {address
+                  ? 'Resolve via Mezo PriceFeed'
+                  : 'Connect wallet to resolve via PriceFeed'}
+              </button>
+            )}
+            {canResolveManual && (
               <>
                 <button
                   onClick={() => run('resolve', OUTCOME.Yes)}
@@ -252,7 +333,14 @@ export function MarketDetail() {
       </div>
 
       <div className="lg:sticky lg:top-24 lg:self-start">
-        <TradePanel market={market} now={now} />
+        <TradePanel
+          market={market}
+          now={now}
+          onTraded={() => {
+            refetchMarket()
+            void refetchPosition()
+          }}
+        />
       </div>
     </div>
   )
