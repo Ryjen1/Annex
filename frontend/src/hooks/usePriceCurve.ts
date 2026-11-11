@@ -5,7 +5,7 @@ import { useReadContracts } from 'wagmi'
 import { annexMarketAbi } from '../lib/abi'
 import { ANNEX_ADDRESS, OUTCOME } from '../lib/contracts'
 import { curveAmounts, postTrade, type Side } from '../lib/amm'
-import type { Market } from './useMarkets'
+import { useFeeBps, type Market } from './useMarkets'
 
 export type CurvePoint = {
   amount: number
@@ -23,6 +23,7 @@ export function usePriceCurve(market: Market | undefined, side: Side): CurvePoin
   const reserveNo = market?.reserveNo ?? 0n
 
   const outcome = side === 'yes' ? OUTCOME.Yes : OUTCOME.No
+  const feeBps = useFeeBps()
 
   const amounts = useMemo(() => {
     if (marketId === undefined) return []
@@ -49,9 +50,11 @@ export function usePriceCurve(market: Market | undefined, side: Side): CurvePoin
     return amounts.map((amount, index) => {
       const result = data[index]?.result as bigint | undefined
       if (result === undefined) return { amount: Number(amount) / 1e18, cents: 0 }
-      const state = postTrade(side, pool, amount, result)
+      const fee = (amount * feeBps) / 10_000n
+      const netAmount = amount - fee
+      const state = postTrade(side, pool, netAmount, result)
       const cents = (side === 'yes' ? state.priceYes : state.priceNo) * 100
       return { amount: Number(amount) / 1e18, cents }
     })
-  }, [amounts, data, marketId, reserveNo, reserveYes, side])
+  }, [amounts, data, feeBps, marketId, reserveNo, reserveYes, side])
 }

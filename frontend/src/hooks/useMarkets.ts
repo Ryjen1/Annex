@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useReadContract, useReadContracts } from 'wagmi'
 
 import { annexMarketAbi } from '../lib/abi'
-import { ANNEX_ADDRESS } from '../lib/contracts'
+import { ANNEX_ADDRESS, isDeployed } from '../lib/contracts'
 
 export type Market = {
   id: bigint
@@ -23,6 +23,20 @@ export type Market = {
   lpSupply: bigint
   priceYes: bigint
   priceNo: bigint
+  kind: number // 0 = Manual, 1 = PriceFeed
+  strikePrice: bigint
+  resolveAbove: boolean
+  resolvedPrice: bigint
+}
+
+export function useFeeBps(): bigint {
+  const { data } = useReadContract({
+    address: ANNEX_ADDRESS,
+    abi: annexMarketAbi,
+    functionName: 'feeBps',
+    query: { enabled: isDeployed, retry: false },
+  })
+  return (data as bigint | undefined) ?? 0n
 }
 
 export function useMarketCount() {
@@ -30,13 +44,13 @@ export function useMarketCount() {
     address: ANNEX_ADDRESS,
     abi: annexMarketAbi,
     functionName: 'marketCount',
-    query: { enabled: ANNEX_ADDRESS !== '0x0000000000000000000000000000000000000000' },
+    query: { enabled: isDeployed },
   })
 }
 
-/** All markets with their prices, loaded with two batched multicalls. */
-export function useMarkets(): { markets: Market[]; isLoading: boolean } {
-  const { data: count, isLoading: countLoading } = useMarketCount()
+/** All markets with their prices and oracle configs, loaded with batched multicalls. */
+export function useMarkets(): { markets: Market[]; isLoading: boolean; refetch: () => void } {
+  const { data: count, isLoading: countLoading, refetch: refetchCount } = useMarketCount()
 
   const ids = useMemo(() => {
     const total = Number(count ?? 0n)
@@ -63,6 +77,16 @@ export function useMarkets(): { markets: Market[]; isLoading: boolean } {
     query: { enabled: ids.length > 0 },
   })
 
+  const priceConfigs = useReadContracts({
+    contracts: ids.map((id) => ({
+      address: ANNEX_ADDRESS,
+      abi: annexMarketAbi,
+      functionName: 'getPriceMarket',
+      args: [id] as const,
+    })),
+    query: { enabled: ids.length > 0 },
+  })
+
   const markets = useMemo<Market[]>(() => {
     if (ids.length === 0) return []
     return ids.map((id, index) => {
@@ -71,6 +95,9 @@ export function useMarkets(): { markets: Market[]; isLoading: boolean } {
         | undefined
       const b = marketB.data?.[index]?.result as
         | readonly [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint]
+        | undefined
+      const p = priceConfigs.data?.[index]?.result as
+        | readonly [number, bigint, boolean, bigint]
         | undefined
 
       if (!a || !b) {
@@ -92,6 +119,10 @@ export function useMarkets(): { markets: Market[]; isLoading: boolean } {
           lpSupply: 0n,
           priceYes: 0n,
           priceNo: 0n,
+          kind: 0,
+          strikePrice: 0n,
+          resolveAbove: true,
+          resolvedPrice: 0n,
         }
       }
 
@@ -113,20 +144,35 @@ export function useMarkets(): { markets: Market[]; isLoading: boolean } {
         lpSupply: b[5],
         priceYes: b[6],
         priceNo: b[7],
+        kind: p ? Number(p[0]) : 0,
+        strikePrice: p ? p[1] : 0n,
+        resolveAbove: p ? p[2] : true,
+        resolvedPrice: p ? p[3] : 0n,
       }
     })
-  }, [ids, marketA.data, marketB.data])
+  }, [ids, marketA.data, marketB.data, priceConfigs.data])
 
-  return { markets, isLoading: countLoading || marketA.isLoading || marketB.isLoading }
+  function refetch() {
+    void refetchCount()
+    void marketA.refetch()
+    void marketB.refetch()
+    void priceConfigs.refetch()
+  }
+
+  return { markets, isLoading: countLoading || marketA.isLoading || marketB.isLoading, refetch }
 }
 
-export function useMarket(id: bigint | undefined): { market: Market | undefined; isLoading: boolean } {
-  const { markets, isLoading } = useMarkets()
+export function useMarket(id: bigint | undefined): {
+  market: Market | undefined
+  isLoading: boolean
+  refetch: () => void
+} {
+  const { markets, isLoading, refetch } = useMarkets()
   const market = useMemo(
     () => markets.find((m) => m.id === id),
     [markets, id],
   )
-  return { market, isLoading }
+  return { market, isLoading, refetch }
 }
 
 /** A user's YES / NO / LP position in every market. */
