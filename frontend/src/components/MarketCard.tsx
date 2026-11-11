@@ -2,7 +2,8 @@
 import { Link } from 'react-router-dom'
 
 import type { Market } from '../hooks/useMarkets'
-import { formatMusd, formatPercent, timeLeft } from '../lib/format'
+import { MARKET_KIND } from '../lib/contracts'
+import { formatMusd, formatPercent, formatUsdPrice, timeLeft } from '../lib/format'
 import { ArrowUpRight, ClockIcon } from './icons'
 
 export function PriceBar({
@@ -59,6 +60,15 @@ export function MarketCard({ market, now }: { market: Market; now: bigint }) {
           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-white/60 uppercase">
             {market.category || 'General'}
           </span>
+          {market.kind === MARKET_KIND.PriceFeed ? (
+            <span className="rounded-full border border-annex-green/30 bg-annex-green/10 px-3 py-1 font-mono text-[10px] font-semibold tracking-[0.12em] text-annex-green uppercase">
+              PriceFeed {market.resolveAbove ? '≥' : '<'} {formatUsdPrice(market.strikePrice)}
+            </span>
+          ) : (
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-medium tracking-[0.14em] text-white/40 uppercase">
+              Manual
+            </span>
+          )}
           {market.resolved ? (
             <span className="rounded-full border border-annex-orange/30 bg-annex-orange/12 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-annex-orange uppercase">
               Resolved {market.outcome === 1 ? 'Yes' : 'No'}

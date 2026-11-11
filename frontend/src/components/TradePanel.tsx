@@ -4,30 +4,49 @@ import { erc20Abi } from 'viem'
 import { useAccount, usePublicClient, useReadContract, useWriteContract } from 'wagmi'
 
 import { annexMarketAbi } from '../lib/abi'
-import { ANNEX_ADDRESS, MUSD_ADDRESS, OUTCOME } from '../lib/contracts'
+import { ANNEX_ADDRESS, isDeployed, MUSD_ADDRESS, OUTCOME } from '../lib/contracts'
 import { formatMusd, formatShares, parseMusdInput } from '../lib/format'
 import { postTrade } from '../lib/amm'
-import type { Market } from '../hooks/useMarkets'
+import { useFeeBps, type Market } from '../hooks/useMarkets'
 import { usePriceCurve } from '../hooks/usePriceCurve'
 import { PriceCurve } from './PriceCurve'
-import { CheckIcon } from './icons'
+import { TroveFundingPanel } from './TroveFundingPanel'
+import { BitcoinIcon, CheckIcon } from './icons'
 
 type Side = typeof OUTCOME.Yes | typeof OUTCOME.No
 
 const QUICK_AMOUNTS = ['10', '50', '250', '1000']
 
-export function TradePanel({ market, now }: { market: Market; now: bigint }) {
+export function TradePanel({
+  market,
+  now,
+  onTraded,
+}: {
+  market: Market
+  now: bigint
+  onTraded?: () => void
+}) {
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
+  const feeBps = useFeeBps()
 
   const [side, setSide] = useState<Side>(OUTCOME.Yes)
   const [amount, setAmount] = useState('25')
+  const [showTroveDrawer, setShowTroveDrawer] = useState(false)
   const [status, setStatus] = useState<'idle' | 'approving' | 'buying'>('idle')
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null)
 
   const parsed = parseMusdInput(amount)
 
-  const { data: allowance } = useReadContract({
+  const { data: musdBalance, refetch: refetchMusd } = useReadContract({
+    address: MUSD_ADDRESS,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: { enabled: Boolean(address) },
+  })
+
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: MUSD_ADDRESS,
     abi: erc20Abi,
     functionName: 'allowance',
@@ -35,19 +54,25 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
     query: { enabled: Boolean(address) },
   })
 
-  const { data: quote, isFetching: quoteLoading } = useReadContract({
+  const { data: quoteResult, isFetching: quoteLoading } = useReadContract({
     address: ANNEX_ADDRESS,
     abi: annexMarketAbi,
-    functionName: 'getBuyQuote',
+    functionName: 'getBuyQuoteWithFee',
     args: [market.id, side, parsed],
-    query: { enabled: parsed > 0n && ANNEX_ADDRESS !== '0x0000000000000000000000000000000000000000' },
+    query: { enabled: parsed > 0n && isDeployed },
   })
+
+  const quoteTuple = quoteResult as readonly [bigint, bigint, bigint] | undefined
+  const quote = quoteTuple?.[0]
+  const protocolFee = quoteTuple?.[1] ?? (parsed * feeBps) / 10_000n
+  const netAmount = quoteTuple?.[2] ?? (parsed - protocolFee)
 
   const approveWrite = useWriteContract()
   const buyWrite = useWriteContract()
 
   const closed = market.resolved || now >= market.endTime
   const needsApproval = (allowance ?? 0n) < parsed
+  const insufficientMusd = isConnected && parsed > 0n && (musdBalance ?? 0n) < parsed
   const busy = status !== 'idle'
 
   async function handleBuy() {
@@ -74,9 +99,12 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
       })
       await publicClient.waitForTransactionReceipt({ hash: buyHash })
       setStatus('idle')
+      void refetchMusd()
+      void refetchAllowance()
+      onTraded?.()
       setMessage({
         tone: 'ok',
-        text: `Bought ${formatShares(quote)} ${side === OUTCOME.Yes ? 'YES' : 'NO'} shares`,
+        text: `Bought ${formatShares(quote)} ${side === OUTCOME.Yes ? 'YES' : 'NO'} shares (fee ${formatMusd(protocolFee, 4)} MUSD)`,
       })
     } catch (error) {
       setStatus('idle')
@@ -92,21 +120,22 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
 
   const state = useMemo(
     () =>
-      quote !== undefined
+      quote !== undefined && netAmount > 0n
         ? postTrade(
             curveSide,
             { reserveYes: market.reserveYes, reserveNo: market.reserveNo },
-            parsed,
+            netAmount,
             quote,
           )
         : null,
-    [curveSide, market.reserveNo, market.reserveYes, parsed, quote],
+    [curveSide, market.reserveNo, market.reserveYes, netAmount, quote],
   )
 
   const impactPct = (state?.priceImpact ?? 0) * 100
   const markerCents = state
     ? (curveSide === 'yes' ? state.priceYes : state.priceNo) * 100
     : null
+  const feePctLabel = `${(Number(feeBps) / 100).toFixed(2)}%`
 
   return (
     <div className="glass overflow-hidden rounded-4xl">
@@ -115,7 +144,7 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
           Trade
         </h2>
         <span className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-white/45">
-          MUSD
+          MUSD · {feePctLabel} fee
         </span>
       </div>
 
@@ -140,12 +169,14 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
         </div>
 
         <div>
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-2 flex items-center justify-between gap-2">
             <label className="label-caps" htmlFor="amount">
               Amount
             </label>
             <span className="font-mono text-[11px] text-white/45">
-              Balance {formatMusd(market.collateral, 0)} MUSD in pool
+              {isConnected
+                ? `Wallet ${formatMusd(musdBalance, 2)} MUSD`
+                : `Pool ${formatMusd(market.collateral, 0)} MUSD`}
             </span>
           </div>
           <div className="relative">
@@ -165,20 +196,46 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
             </span>
           </div>
 
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {QUICK_AMOUNTS.map((value) => (
+          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5">
+            <div className="flex flex-wrap gap-1.5">
+              {QUICK_AMOUNTS.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setAmount(value)}
+                  disabled={closed}
+                  className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[11px] text-white/45 transition-colors hover:border-annex-orange/40 hover:text-annex-ink disabled:opacity-40"
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            {isConnected && !closed && (
               <button
-                key={value}
                 type="button"
-                onClick={() => setAmount(value)}
-                disabled={closed}
-                className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 font-mono text-[11px] text-white/45 transition-colors hover:border-annex-orange/40 hover:text-annex-ink disabled:opacity-40"
+                onClick={() => setShowTroveDrawer((open) => !open)}
+                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  insufficientMusd
+                    ? 'border-annex-orange/60 bg-annex-orange/15 text-annex-orange'
+                    : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-annex-orange/40 hover:text-annex-orange-soft'
+                }`}
               >
-                {value}
+                <BitcoinIcon className="h-3 w-3" />
+                {showTroveDrawer ? 'Hide Trove' : insufficientMusd ? 'Mint MUSD in Trove' : 'Fund via Trove'}
               </button>
-            ))}
+            )}
           </div>
         </div>
+
+        {showTroveDrawer && isConnected && (
+          <TroveFundingPanel
+            compact
+            suggestedMusd={amount}
+            onFunded={() => {
+              void refetchMusd()
+            }}
+          />
+        )}
 
         <div className="rounded-2xl border border-white/6 bg-white/[0.02] p-4">
           <div className="mb-2 flex items-center justify-between">
@@ -198,25 +255,33 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
           />
         </div>
 
-        <dl className="space-y-2.5 text-sm">
+        <dl className="space-y-2 rounded-2xl border border-white/6 bg-white/[0.02] p-3.5 text-sm">
+          <Row label="Order total" value={`${formatMusd(parsed)} MUSD`} />
           <Row
-            label="You receive"
-            value={
-              quoteLoading
-                ? '…'
-                : `${formatShares(quote)} ${side === OUTCOME.Yes ? 'YES' : 'NO'}`
-            }
-            highlight
+            label={`Protocol fee (${feePctLabel})`}
+            value={`${formatMusd(protocolFee, 4)} MUSD`}
           />
+          <Row label="Net into AMM" value={`${formatMusd(netAmount, 4)} MUSD`} />
+          <div className="border-t border-white/6 pt-2">
+            <Row
+              label="You receive"
+              value={
+                quoteLoading
+                  ? '…'
+                  : `${formatShares(quote)} ${side === OUTCOME.Yes ? 'YES' : 'NO'}`
+              }
+              highlight
+            />
+          </div>
           <Row
-            label="Average price"
+            label="Effective price"
             value={
               quote && quote > 0n
-                ? `${((Number(parsed) / Number(quote)) * 100).toFixed(2)}¢`
+                ? `${((Number(parsed) / Number(quote)) * 100).toFixed(2)}¢ / share`
                 : '—'
             }
           />
-          <Row label="Max payout" value={`${formatMusd(quote)} MUSD`} />
+          <Row label="Win payout (1:1, 0% exit fee)" value={`${formatMusd(quote)} MUSD`} />
         </dl>
 
         {message && (
@@ -234,21 +299,23 @@ export function TradePanel({ market, now }: { market: Market; now: bigint }) {
 
         <button
           onClick={handleBuy}
-          disabled={!isConnected || closed || parsed <= 0n || busy}
+          disabled={!isConnected || closed || parsed <= 0n || insufficientMusd || busy}
           className="btn-primary btn-primary-hover w-full px-6 py-3.5 text-[15px]"
         >
           {!isConnected
             ? 'Connect wallet to trade'
             : closed
               ? 'Market closed'
-              : busy
-                ? status === 'approving'
-                  ? 'Approving MUSD…'
-                  : 'Buying…'
-                : `Buy ${side === OUTCOME.Yes ? 'YES' : 'NO'} for ${formatMusd(parsed)} MUSD`}
+              : insufficientMusd
+                ? 'Insufficient MUSD — open or top up Trove above'
+                : busy
+                  ? status === 'approving'
+                    ? 'Approving MUSD…'
+                    : 'Buying…'
+                  : `Buy ${side === OUTCOME.Yes ? 'YES' : 'NO'} for ${formatMusd(parsed)} MUSD`}
         </button>
 
-        {needsApproval && parsed > 0n && isConnected && !closed && (
+        {needsApproval && parsed > 0n && isConnected && !closed && !insufficientMusd && (
           <p className="text-center text-[11px] text-white/45">
             First transaction approves MUSD for the Annex contract.
           </p>
