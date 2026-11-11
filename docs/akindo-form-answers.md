@@ -1,85 +1,65 @@
-# Annex — AKINDO form answers
+# Annex — AKINDO form answers (Wave 2)
 
-> Paste-ready answers for the submission form sections.
+> Paste-ready answers for the Wave 2 submission form sections (including OVERVIEW to replace the Wave 1 `#ERROR!`).
+
+==============================================================================
+OVERVIEW
+==============================================================================
+Annex is a permissionless, non-custodial binary prediction market protocol built natively on Mezo and settled in MUSD. In Wave 2, users can open or top up their own MUSD Trove directly inside the app via BorrowerOperations and TroveManager, trade objective BTC/USD strike markets settled permissionlessly against the canonical Mezo PriceFeed alongside resolver-settled event markets, and pay a disclosed 0.30% protocol entry fee isolated from 1:1 redeemable pool collateral.
 
 ==============================================================================
 WHAT IT DOES
 ==============================================================================
-Annex is a permissionless binary prediction market protocol on Mezo Testnet, settled in MUSD.
+Annex is a permissionless binary prediction market protocol on Mezo Testnet, settled 100% in MUSD.
 
-Anyone can create a yes/no market in one transaction: question, resolution criteria, category, close date and initial liquidity. Traders then buy YES or NO shares from an on-chain constant-product AMM that prices both sides from the pool's own reserves. When a market's end time passes, its resolver (the creator by default, transferable, or the protocol owner) posts the outcome, and winning shares redeem 1:1 for MUSD while the liquidity provider claims the rest of the pool.
+Wave 2 connects Mezo's core CDP and oracle primitives directly into both the smart contract and frontend:
+1. In-app Trove funding: From `/trove` or directly inside the trade and create drawers, any user can inspect their live BTC collateral, MUSD debt, individual collateral ratio (ICR), borrowing capacity and liquidation price via `TroveManager` and `AnnexMarket.getUserTroveState`, then open a Trove, add collateral, or draw extra MUSD through `BorrowerOperations` without leaving Annex.
+2. Two clearly separated market types: Objective BTC/USD threshold markets (`createPriceMarket`, e.g. "BTC >= $95,000 at expiry") settle permissionlessly after `endTime` using Mezo's canonical `PriceFeed.fetchPrice()` (`resolvePriceMarket`), with manual overrides blocked on-chain. Subjective/event markets keep `MarketKind.Manual` resolver settlement (`resolve`).
+3. Constant-product AMM with isolated revenue: `buyShares` charges a disclosed 0.30% (`30 bps`) protocol entry fee into `accruedFees`, splits the remaining MUSD into YES + NO shares across `reserveYes * reserveNo = k`, and guarantees 1:1 MUSD redemptions (`0%` exit fee) for winners while LPs claim the remaining pool surplus.
 
-The whole protocol is one immutable contract. No proxy, no upgrade key, no admin withdrawal function, no oracle, no off-chain component. MUSD is the reserve asset: liquidity providers deposit it, traders pay it, winners settle in it. Gas is paid in BTC, so the protocol consumes both assets of the Mezo economy - BTC for execution and MUSD for settlement.
-
-It is live: the contract is deployed on Mezo Testnet (0xfdbfde0a430de94c1d862cfc290c36549b5a501d) against canonical MUSD, with seeded markets, a public frontend at annex-markets.vercel.app, 51 passing tests and a public repository.
-
-[character count: 1162]
+All 65 Foundry tests (unit, fuzz, reentrancy, Wave 1 regression + Wave 2 PriceFeed/fee/Trove tests) and production frontend checks pass, and the Wave 2 build is verified end-to-end against a fork of Mezo Testnet alongside legacy Wave 1 contract `0xfdbfde0a430de94c1d862cfc290c36549b5a501d`.
 
 ==============================================================================
 THE PROBLEM IT SOLVES
 ==============================================================================
-Prediction markets are proven demand, but the venues are not built for Bitcoin users. They are typically offshore and custodial (your funds sit with an operator, not in a contract you can verify), opaque (a private order book and risk engine you cannot audit), and hard to reach - a Bitcoin-native user needs a separate chain, a bridge, and a stablecoin they do not hold.
+Prediction markets have proven demand, yet most venues are either custodial and opaque or live on external chains requiring a bridge and a non-Bitcoin stablecoin. Even when deployed on a Bitcoin EVM, treating MUSD as a plain ERC-20 still forces users out of the product to open a CDP elsewhere before they can fund a single trade, and leaves objective price markets dependent on manual human resolution.
 
-Bitcoin has the money, the users and the finality, and there is no market infrastructure on Bitcoin rails where collective opinion gets priced. Annex builds that venue natively on Mezo, a Bitcoin EVM where the stablecoin (MUSD) and the gas asset (BTC) are already the ones the ecosystem uses.
-
-For Mezo specifically this extends MUSD from savings and payments into active, price-discovery capital. A prediction market holds MUSD as pool collateral, prices it continuously, and pays it out at settlement, so the stablecoin earns a spread instead of sitting idle. Traders on Bitcoin get a native way to express a view on measurable outcomes without leaving the chain, and without trusting an operator or trusting a private risk model: solvency is an on-chain invariant, not a claim.
-
-The result is a market venue that is non-custodial, provably solvent, and auditable by reading the contract.
-
-[character count: 1263]
+Annex solves all three on Mezo:
+- Native onboarding: Users turn BTC into MUSD inside Annex via Mezo's `BorrowerOperations`, watching live ICR and liquidation price update as they mint, then move immediately into markets.
+- Trust-minimized BTC settlement: BTC/USD strike markets resolve strictly from Mezo's canonical `PriceFeed` after expiry while subjective event markets remain cleanly separated under creator/resolver governance.
+- Sustainable, provably solvent economics: A 0.30% entry fee funds the protocol inside an isolated `accruedFees` ledger while `MUSD.balanceOf(this) == totalLockedCollateral + accruedFees` enforces 1:1 MUSD backing on every market position.
 
 ==============================================================================
 CHALLENGES I RAN INTO
 ==============================================================================
-1. The AMM was wrong at first. A deposit was not split into a complete set, so the quoted price (the marginal cost) and the price actually charged diverged by about 2.2x - a 50-cent market charged roughly $1.10 per share. I caught it by asserting that the execution price must lie between the pre-trade and post-trade price, then fixed it by splitting every deposit into `a` YES + `a` NO, with the NO half acting as the pool's counter-collateral. Four regression tests now lock that behaviour in.
-
-2. `k` is frozen at market creation in the contract, so re-deriving the price curve in the frontend from the current reserves drifts by rounding once a market has been traded. Rather than mirror the swap math locally, the price curve reads the contract's own `getBuyQuote` through one batched multicall - the chart is the real on-chain curve, not a re-implementation of it.
-
-3. The wallet stack is where most of the integration time went. Mezo Passport (RainbowKit + wagmi) needed node polyfills for Buffer/process/global and React 18 rather than 19, and a placeholder WalletConnect project id was firing rejected relay requests, so that connector was removed until a real id exists.
-
-4. Getting MUSD on testnet was not a faucet click: MUSD is a CDP stablecoin, so it means faucet BTC, open a trove through BorrowerOperations (1,800 MUSD minimum net debt, 110% MCR), and borrow against the collateral.
-
-5. Solidity's stack-too-deep limit forced the market views to be split into getMarketA (strings and roles) and getMarketB (numerics and prices); the frontend calls both.
-
-[character count: 1570]
+1. Complete-set AMM pricing bug (Wave 1): Deposits initially skipped complete-set splitting, causing a ~2.2x divergence between quoted marginal price and charged cost. Splitting every net deposit into `netAmount` YES + `netAmount` NO (with counter-side shares seeding the pool) unified quote and execution price, locked in by four named regression tests.
+2. `BorrowerOperations.addColl` capacity nuance on Mezo (Wave 2): Testing against real Matsnet CDP contracts showed `addColl` lowers liquidation risk without immediately raising `TroveManager.getTroveMaxBorrowingCapacity` unless `refinance()` updates recorded borrowing capacity. Our `TroveFundingPanel` handles both direct single-tx `adjustTrove` and `addColl -> refinance -> withdrawMUSD` automatically.
+3. Mezo `PriceFeed` custom precompile (`0x7b7c...0015`): Canonical `PriceFeed.fetchPrice()` delegates to a Mezo Go precompile on live Testnet RPC (~$73.4k BTC live), while local Anvil forks lack that precompile bytecode unless shimmed; additionally, Matsnet headers omit EIP-4844 blob gas, requiring London/Shanghai EVM settings (`--hardfork shanghai`) in Anvil forks and catching a stale documented address (`96beE5` vs real `0xCdF7...94beE5` for `BorrowerOperations`).
+4. `SortedTroves` O(N) gas cost with 350+ testnet Troves: Zero hints force linked-list scans across all Troves; computing exact `(upperHint, lowerHint)` via `HintHelpers` + `SortedTroves` in-app avoids excessive gas and RPC latency.
+5. Idle-pool yield safety trade-off: Auditing Mezo `StabilityPool.sol` confirmed withdrawals revert whenever undercollateralized troves exist and `offset()` converts MUSD to BTC collateral during liquidations, so routing resting AMM collateral there would break guaranteed 1:1 MUSD redemption liveness — leading us to defer idle-pool yield cleanly until atomic `sMUSD` vault liquidity exists.
 
 ==============================================================================
 TECHNOLOGIES I USED
 ==============================================================================
-Contracts: Solidity 0.8.28 (EVM `london`, optimizer 200 runs, via-ir), Foundry with forge-std - unit, fuzz (256 runs) and invariant tests, `forge fmt`, and CI on GitHub Actions.
+Contracts: Solidity 0.8.28 (EVM `london`, optimizer 200 runs, via-ir), Foundry + forge-std (65 tests: 51 Wave 1 + 14 Wave 2 unit/fuzz/invariant), Blockscout verification (`explorer.test.mezo.org`), integrated directly with canonical Mezo MUSD (`0x1189...Ac503`), `PriceFeed` (`0x86bC...b9366`), and `TroveManager` (`0xE47c...6bb0`).
 
-Frontend: viem, wagmi v2 and @mezo-org/passport (RainbowKit) for wallet connection, @tanstack/react-query for batched multicall reads, React 18 + TypeScript + Vite 8 + Tailwind CSS v4, and vite-plugin-node-polyfills because the Mezo wallet stack expects Buffer/process/global in the browser.
+Frontend: React 18, TypeScript, Vite 8, Tailwind CSS v4, wagmi v2 + viem, @mezo-org/passport (RainbowKit), @tanstack/react-query multicalls, vite-plugin-node-polyfills, plus direct ABIs for Mezo `BorrowerOperations` (`0xCdF7...4beE5`), `HintHelpers` (`0x4e4c...BCF6`), and `SortedTroves` (`0x722E...68fA`).
 
-Tooling: Vercel for the live frontend, static asset hosting and the submission deck/video; GitHub Actions for the test suite; Python (edge-tts + ffmpeg) to produce the narrated product video; hand-written SVG/CSS for the brand kit and the hero scene.
-
-There is no backend, no database, no indexer and no off-chain service: every market, price, position and payout is read from or written to the chain. The deployed contract depends on nothing but an ERC-20 interface.
-
-[character count: 939]
+Infrastructure: Zero backend, database, or indexer — every Trove health ratio, market quote, AMM price curve (`getBuyQuoteWithFee`), and settlement reads from and writes directly to Mezo Testnet (chain 31611) and Vercel static hosting.
 
 ==============================================================================
 HOW WE BUILT IT
 ==============================================================================
-We started from the invariant rather than the interface: totalCollateral == totalYes == totalNo, because every deposit mints exactly one YES and one NO share.
-
-Then the AMM. A deposit of `a` MUSD splits into a complete set (a YES + a NO). The NO half becomes the pool's counter-collateral, the pool releases YES with `k` preserved, and the buyer keeps `a + swapOut` shares. `priceYes = reserveNo / (reserveYes + reserveNo)` is the true marginal cost of a share, so the quote the UI shows is the price the market charges, plus ordinary slippage - the difference between the pre-trade and post-trade price is exactly the spread the liquidity provider earns.
-
-The contract is a single immutable market table with create, buy, resolve, redeem, claimLP and setResolver, plus resolver/owner roles that cannot touch pricing or withdraw funds. 51 Foundry tests cover unit paths, fuzz over random trade sequences, a reentrancy attempt through a malicious token during transferFrom, resolution authorisation and timing, full lifecycles for both outcomes, and assertions of the solvency, share-accounting and quote-vs-price invariants after every operation.
-
-The frontend reads markets and user positions through two batched multicalls, renders the live AMM price curve, and carries a user through approve -> buy -> resolve -> redeem. Deployment is a forge script (canonical MUSD on Mezo, a mock everywhere else) plus a seed script; the AMM helpers were verified against a fork of Mezo Testnet by comparing derived post-trade reserves with real on-chain state.
-
-[character count: 1549]
+We extended `AnnexMarket.sol` without adding an upgradeable proxy or breaking the original 51 tests:
+- Added `MarketKind { Manual, PriceFeed }` and `PriceMarketConfig { kind, strikePrice, resolveAbove, resolvedPrice }`, implementing `createPriceMarket` and permissionless `resolvePriceMarket` wired to Mezo `PriceFeed.fetchPrice()` (reverting automatically if Mezo's oracle is stale). Existing `resolve()` and `setResolver()` reject `PriceFeed` markets with `PriceFeedMarketOnly()`.
+- Added `feeBps` (30 bps = 0.30%, immutable/capped at `MAX_FEE_BPS = 200`), separating `totalLockedCollateral` from `accruedFees` so `claimFees()` can never touch market collateral and `redeem()` / `claimLp()` remain 1:1 with zero exit fee.
+- Exposed `getBuyQuoteWithFee`, `liveBtcPrice`, and `getUserTroveState` directly on `AnnexMarket` and wired a complete in-app Trove manager (`/trove` + inline `TroveFundingPanel` inside trade/create flows) using `BorrowerOperations`, `HintHelpers`, and `SortedTroves`.
+- Audited Mezo `StabilityPool` on-chain before declining risky idle-collateral parking, then verified everything across 65 Foundry tests, TypeScript/oxlint checks, and an end-to-end Mezo Testnet fork script (`openTrove` -> `addColl` -> `withdrawMUSD` -> `SeedMarkets` -> `buyShares` with 30 bps fee -> `resolvePriceMarket` -> `redeem` -> `claimLp` -> `claimFees`).
 
 ==============================================================================
 WHAT WE LEARNED
 ==============================================================================
-1. The accounting detail is the product. Splitting a deposit into a complete set is a small change in code, but it is the difference between a market maker and a guaranteed loss for every buyer. We got that right by writing invariants and regression tests, not by reading the code carefully.
-
-2. Show the chain's numbers; do not re-derive them. Moving the price curve from a local AMM implementation to on-chain quotes removed an entire class of rounding bugs and made the UI provably consistent with settlement.
-
-3. "Native Bitcoin EVM" is a systems problem, not a compiler problem. The wallet stack needed polyfills and a React version pin, the frontend needed a multicall contract, and MUSD had to be borrowed against BTC rather than clicked out of a faucet. The primitives are simple; integrating them honestly is not.
-
-4. UX is trust. Displaying price impact, average execution price and a reserve-backed price rail is what separates a betting app from a market people can verify - and with judging weighted on user experience and composability, that transparency is the product.
-
-5. A permissionless protocol is mostly explicit, boring design: who can resolve, who can claim the LP surplus, what happens to unclaimed collateral. We chose narrow, stated roles over admin powers, and would rather ship fewer features than an admin key.
-
-[character count: 1339]
+1. Composability means meeting the other protocol's exact state machine: integrating `BorrowerOperations` revealed `maxBorrowingCapacity` persistence across `addColl`/`refinance()` and O(N) hint sensitivity in `SortedTroves` — details you only catch by testing against the live chain contracts.
+2. Pricing and accounting invariants are the real UX: entry-fee isolation (`totalLockedCollateral` vs `accruedFees`) keeps every YES/NO share redeemable at an exact 1.00 MUSD par while giving the protocol clean revenue.
+3. Saying "no" to unsafe yield is an engineering deliverable: proving from `StabilityPool.sol` bytecode why parking prediction collateral there can block withdrawals saved user solvency from silent liquidation risk.
+4. Keeping objective PriceFeed markets and subjective resolver markets structurally separate eliminates ambiguity for both traders and automated settlement bots.
