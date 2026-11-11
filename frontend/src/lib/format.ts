@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import { formatUnits } from 'viem'
+import { formatUnits, parseUnits } from 'viem'
 
 export const WAD = 10n ** 18n
 
@@ -66,10 +66,47 @@ export function formatDate(timestamp: bigint | undefined): string {
   })
 }
 
-export function parseMusdInput(value: string): bigint {
+/** Format an 18-decimal BTC amount. */
+export function formatBtc(value: bigint | undefined, decimals = 4): string {
+  if (value === undefined) return '0.0000'
+  const asNumber = Number(formatUnits(value, 18))
+  if (!Number.isFinite(asNumber)) return '0.0000'
+  return asNumber.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+}
+
+/** Format an 18-decimal USD oracle price (e.g. $74,120). */
+export function formatUsdPrice(value: bigint | undefined, decimals = 0): string {
+  if (value === undefined || value === 0n) return '—'
+  const asNumber = Number(formatUnits(value, 18))
+  if (!Number.isFinite(asNumber)) return '—'
+  return `$${asNumber.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })}`
+}
+
+/** Format an 18-decimal collateral ratio (1.1e18 -> 110%). */
+export function formatRatioPct(ratio: bigint | undefined): string {
+  if (ratio === undefined || ratio === 0n) return '—'
+  const pct = Number(formatUnits(ratio, 18)) * 100
+  if (!Number.isFinite(pct) || pct > 100_000) return '∞'
+  return `${pct.toFixed(0)}%`
+}
+
+export function parseDecimalInput(value: string): bigint {
   const trimmed = value.trim()
   if (!trimmed) return 0n
-  const numeric = Number(trimmed)
-  if (!Number.isFinite(numeric) || numeric < 0) return 0n
-  return BigInt(Math.round(numeric * 1e6)) * (10n ** 12n)
+  if (!/^\d*\.?\d*$/.test(trimmed) || trimmed === '.') return 0n
+  try {
+    return parseUnits(trimmed, 18)
+  } catch {
+    return 0n
+  }
+}
+
+export function parseMusdInput(value: string): bigint {
+  return parseDecimalInput(value)
 }
