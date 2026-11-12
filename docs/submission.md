@@ -203,7 +203,7 @@ integrated Mezo DeFi application (Level 3+):
   `https://api.explorer.test.mezo.org/api/`, Wave 2 pitch deck & demo script updated, and full
   AKINDO Overview copy written to replace `#ERROR!`.
 
-## Real-user & live protocol testing evidence (Wave 2 — Mezo Testnet)
+## Live protocol testing evidence (Wave 2 — Mezo Testnet)
 
 > Executed live against verified Wave 2 `AnnexMarket` (`0x3b760389E795a191219e86edD8bef498B31c680d`)
 > using dedicated non-deployer user wallets alongside deployer Trove/market operations:
@@ -230,8 +230,7 @@ integrated Mezo DeFi application (Level 3+):
 
 | Member | Role | X / LinkedIn |
 |--------|------|--------------|
-| `<name>` | Protocol + frontend engineer | `<handle>` |
-| `<name>` | Design / operations | `<handle>` |
+| Maryjane Okafor | Protocol + frontend engineer | @mzyukay |
 
 ## Submission checklist
 
