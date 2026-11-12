@@ -45,5 +45,4 @@ fee breakdown + PriceFeed/Manual settle panel), `/create` (dual Market Type buil
 - Never show private keys, seed phrases, or unrelated personal browser bookmarks.
 - If a testnet confirmation takes >3 s, show the Mezo Testnet Explorer tx confirmation rather
   than dead air, then return to updated UI state.
-- Upload unlisted to YouTube, replace Wave 1 video URL in `docs/submission.md`, and verify the
-  overview and team fields on AKINDO match `docs/submission.md`.
+- Upload unlisted to YouTube and attach the video URL on AKINDO alongside the overview and team fields.

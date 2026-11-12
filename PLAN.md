@@ -125,9 +125,6 @@ create + portfolio pages render, no console errors.
 - **Frontend deployed** — https://annex-markets.vercel.app (Vercel project `annex-markets`,
   VITE_* env vars set there, `frontend/.vercelignore` keeps local `.env` out of the upload,
   `frontend/vercel.json` rewrites SPA routes to `index.html`)
-- **Submission copy** — `docs/submission.md`: paste-ready answers for every AKINDO form field
-  (name, category, TL;DR, how it works, target group, stack, track, chain, status, readiness,
-  links, wave updates, milestones, team info) + checklist
 - **Video shot list** — `docs/demo-script.md`: 9-shot, 120 s recording plan with voiceover
 - **Deployer key** — generated at `~/.annex/deployer.key` (outside the repo),
   address `0xac89fFA908D0bD7A9EE78DfAd4b40362d9971b15`
@@ -168,10 +165,9 @@ create + portfolio pages render, no console errors.
   `assets/deck.pdf` + `assets/slides/slide-01…08.png`
 - **Screenshots** — `assets/screenshots/`: landing, markets, market detail, second market,
   create flow, mobile landing — captured from the live app
-- **Stable URLs** — the same files are served from the app, so the submission can link them:
+- **Stable URLs** — the same files are served from the app:
   `https://annex-markets.vercel.app/assets/{banner.png, og-card.png, logo-mark.png,
   logo-lockup.png, deck.pdf}`. Favicon + OG/Twitter meta tags point at the new brand.
-- Asset index with file paths and live URLs is in `docs/submission.md`.
 
 ### 12. Wave 1 Pitch video ✅ (session 3)
 - **`assets/video/annex-pitch.mp4`** — 78 s, 1920×1080 H.264, narrated (neural TTS), captions
@@ -223,12 +219,11 @@ create + portfolio pages render, no console errors.
 ### B. Wave 2 Demo Video (HIGH)
 - Record and upload the updated 2-minute Wave 2 walkthrough per `docs/demo-script.md`
   (Trove open/top-up → PriceFeed market + 0.30% fee buy → permissionless settle → 1:1 redeem →
-  `claimFees`), then link on YouTube in `docs/submission.md`.
+  `claimFees`), then attach the unlisted YouTube link on AKINDO.
 
-### C. Team info + AKINDO Form Update (HIGH)
-- Fill in the team table in `docs/submission.md`, then submit the Wave 2 copy from
-  `docs/submission.md` / `docs/akindo-form-answers.md` on AKINDO (fixes Wave 1 `#ERROR!` overview
-  and empty team fields).
+### C. Team info + AKINDO Form Update (COMPLETED / PRIVATE)
+- AKINDO Wave 2 copy & team info submitted separately (internal submission forms removed from
+  the public repository).
 
 ### D. Nice-to-have (deferred — low priority)
 - Transferable LP shares (secondary LP market) — currently creator-only.

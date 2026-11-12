@@ -19,7 +19,7 @@ strictly 1:1 for MUSD.
 - **Wave 1 Contract (legacy v1):** [`0xfdbfde0a430de94c1d862cfc290c36549b5a501d`](https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d)
 - **Live app:** https://annex-markets.vercel.app
 - **Repo:** https://github.com/Ryjen1/Annex
-- **Docs:** [`docs/architecture.md`](docs/architecture.md) · [`docs/pitch-deck.md`](docs/pitch-deck.md) · [`docs/submission.md`](docs/submission.md) · [`docs/demo-script.md`](docs/demo-script.md)
+- **Docs:** [`docs/architecture.md`](docs/architecture.md) · [`docs/pitch-deck.md`](docs/pitch-deck.md) · [`docs/demo-script.md`](docs/demo-script.md)
 
 ---
 
@@ -81,7 +81,7 @@ Annex/
 │   ├── src/hooks/               useMarkets.ts, usePriceCurve.ts, useTrove.ts
 │   ├── src/components/          Header, MarketCard, PriceCurve, TradePanel, TroveFundingPanel
 │   └── src/pages/               Landing, Markets, MarketDetail, CreateMarket, Portfolio, Trove
-└── docs/                        architecture.md, submission.md, akindo-form-answers.md, pitch-deck.md, demo-script.md
+└── docs/                        architecture.md, pitch-deck.md, demo-script.md
 ```
 
 ---
