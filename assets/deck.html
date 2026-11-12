@@ -253,15 +253,15 @@ MUSD.balanceOf(this) == totalLockedCollateral + accruedFees &nbsp;|&nbsp; locked
         <table>
           <thead><tr><th>Piece</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>In-app Trove funding (<code>BorrowerOperations</code> + <code>TroveManager</code> + hints)</td><td class="ok">done — /trove + drawers</td></tr>
-            <tr><td>Dual resolution (<code>PriceFeed</code> BTC markets vs <code>Manual</code> events)</td><td class="ok">done — audited &amp; guarded</td></tr>
-            <tr><td><code>0.30%</code> entry protocol fee + <code>claimFees</code> collateral isolation</td><td class="ok">done — 65 tests green</td></tr>
-            <tr><td>Frontend (React 18 / Passport / Curve), scripts, deck &amp; docs</td><td class="ok">done — fork E2E verified</td></tr>
+            <tr><td>In-app Trove funding (<code>BorrowerOperations</code> + <code>TroveManager</code> + hints)</td><td class="ok">live — /trove + 2,440 MUSD Trove</td></tr>
+            <tr><td>Dual resolution (<code>PriceFeed</code> BTC markets vs <code>Manual</code> events)</td><td class="ok">live — 8 markets (6 open, 2 settled)</td></tr>
+            <tr><td><code>0.30%</code> entry protocol fee + <code>claimFees</code> collateral isolation</td><td class="ok">live — 65 tests + 0.48 MUSD claimed</td></tr>
+            <tr><td>Frontend (React 18 / Passport / Curve) + non-deployer testnet txs</td><td class="ok">done — Blockscout verified</td></tr>
           </tbody>
         </table>
         <div class="stat-row">
-          <div class="stat"><div class="label">Wave 1 Legacy</div><div class="v" style="font-size: 14px; font-family: 'JetBrains Mono', monospace;">0xfdbfde0a…5a501d</div></div>
-          <div class="stat"><div class="label">Wave 2 Status</div><div class="v" style="font-size: 20px;">Deploy Ready</div></div>
+          <div class="stat"><div class="label">Wave 2 (Verified)</div><div class="v" style="font-size: 14px; font-family: 'JetBrains Mono', monospace;">0x3b760389…31c680d</div></div>
+          <div class="stat"><div class="label">Live Markets</div><div class="v" style="font-size: 20px;">8 Seeded</div></div>
           <div class="stat"><div class="label">Tests</div><div class="v">65 / 65</div></div>
           <div class="stat"><div class="label">Chain</div><div class="v">31611</div></div>
         </div>
@@ -277,8 +277,8 @@ MUSD.balanceOf(this) == totalLockedCollateral + accruedFees &nbsp;|&nbsp; locked
         <div class="eyebrow">Roadmap</div>
         <h2 style="margin-top: 14px;">Bitcoin-native markets for<br /><span class="grad">every measurable claim.</span></h2>
         <div class="grid-3">
-          <div class="card"><div class="label">Wave 2 Shipped</div><h3 style="margin-top: 6px;">L3+ Integration</h3><p>In-app Mezo Troves, BTC PriceFeed settlement, 0.30% isolated fee &amp; deferred yield proof.</p></div>
-          <div class="card"><div class="label">Wave 2 Launch</div><h3 style="margin-top: 6px;">Live Rollout</h3><p>Deploy &amp; Blockscout-verify Wave 2 contract, redeploy frontend, external user testing &amp; demo cut.</p></div>
+          <div class="card"><div class="label">Wave 2 Live</div><h3 style="margin-top: 6px;">L3+ Deployed</h3><p>Blockscout-verified 0x3b760389…31c680d, in-app Trove + PriceFeed markets, external user txs.</p></div>
+          <div class="card"><div class="label">Submission</div><h3 style="margin-top: 6px;">Portal &amp; Media</h3><p>Verify Vercel env pointer, record 2-min Wave 2 walkthrough &amp; publish AKINDO overview + team.</p></div>
           <div class="card"><div class="label">Beyond</div><h3 style="margin-top: 6px;">Mainnet Scale</h3><p>Atomic sMUSD yield routing, transferable ERC-20 LP positions &amp; per-market activity charts.</p></div>
         </div>
         <div style="margin-top: 34px; display: flex; align-items: center; gap: 18px;">

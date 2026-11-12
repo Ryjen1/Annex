@@ -203,23 +203,32 @@ create + portfolio pages render, no console errors.
 
 ---
 
-## What's NOT Done Yet (requires deployer keys / auth / human recording)
+## What's NOT Done Yet (requires Vercel auth / human recording)
 
-### A. Wave 2 Testnet Deployment, Blockscout Verification & Live Seed (HIGH)
-- Run `DeployAnnex.s.sol`, verify `AnnexMarket` on `https://explorer.test.mezo.org`, run
-  `SeedMarkets.s.sol` & `SmokeTestWave2.s.sol`, update `VITE_ANNEX_ADDRESS`, and redeploy
-  frontend (blocked on user `PRIVATE_KEY` + Vercel auth).
+### A. Wave 2 Testnet Deployment, Blockscout Verification & Live Seed ✅ (session 5)
+- **Wave 2 `AnnexMarket` deployed & verified on Blockscout:** `0x3b760389E795a191219e86edD8bef498B31c680d`
+  (tx `0x3d8abacb409d97c505499357a4c797eca1713daa8c04ac2a23697bc6756b2b2b`), verified on
+  `https://explorer.test.mezo.org/address/0x3b760389E795a191219e86edD8bef498B31c680d` via
+  `https://api.explorer.test.mezo.org/api/`.
+- **Live Trove + 8 seeded/tested markets + non-deployer trades:** Trove opened/topped up via
+  `BorrowerOperations` (`0x3369...d9fb3`, `0x6277...9c5d1`, `0x421c...909e` -> `2,440 MUSD`), 6 open
+  markets seeded (`#0`–`#5`: 2 `PriceFeed` + 4 `Manual`) plus 2 settled smoke markets (`#6` Manual,
+  `#7` PriceFeed permissionlessly settled by non-deployer `user2` `0x7161...c43d`), real external
+  user trades (`user1` `0x222dCAfe7bfba7Da1207BA2F3CDD7e4B42F9B672`, `user2`
+  `0x18faF506D79982A23C155D6ED8277051e68617a3`), `claimFees` (`0.48 MUSD`, tx `0xc4c5...2359`), and
+  exact post-claim solvency (`MUSD.balanceOf == totalLockedCollateral == 2269.64 MUSD`).
+- **Remaining:** verify/set `VITE_ANNEX_ADDRESS=0x3b760389E795a191219e86edD8bef498B31c680d` on
+  Vercel (`frontend/src/lib/contracts.ts` default fallback updated).
 
-### B. Real External-User Testnet Activity & Wave 2 Demo Video (HIGH)
-- Execute real trades from non-deployer wallets against the deployed Wave 2 contract and record
-  the updated 2-minute Wave 2 walkthrough per `docs/demo-script.md` (Trove open/top-up →
-  PriceFeed market + 0.30% fee buy → permissionless settle → 1:1 redeem → `claimFees`), then
-  host on YouTube and link in `docs/submission.md`.
+### B. Wave 2 Demo Video (HIGH)
+- Record and upload the updated 2-minute Wave 2 walkthrough per `docs/demo-script.md`
+  (Trove open/top-up → PriceFeed market + 0.30% fee buy → permissionless settle → 1:1 redeem →
+  `claimFees`), then link on YouTube in `docs/submission.md`.
 
 ### C. Team info + AKINDO Form Update (HIGH)
-- Fill in the team table + real-user tx evidence in `docs/submission.md`, then submit the Wave 2
-  copy from `docs/submission.md` / `docs/akindo-form-answers.md` on AKINDO (fixes Wave 1
-  `#ERROR!` overview and empty team fields).
+- Fill in the team table in `docs/submission.md`, then submit the Wave 2 copy from
+  `docs/submission.md` / `docs/akindo-form-answers.md` on AKINDO (fixes Wave 1 `#ERROR!` overview
+  and empty team fields).
 
 ### D. Nice-to-have (deferred — low priority)
 - Transferable LP shares (secondary LP market) — currently creator-only.
@@ -237,7 +246,7 @@ forge build                    # compile
 forge test -vvv                # run all 65 tests (51 Wave 1 + 14 Wave 2)
 forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 forge verify-contract <ADDRESS> src/AnnexMarket.sol:AnnexMarket \
-  --verifier blockscout --verifier-url https://explorer.test.mezo.org/api/ \
+  --verifier blockscout --verifier-url https://api.explorer.test.mezo.org/api/ \
   --constructor-args $(cast abi-encode "constructor(address,address,address,uint256)" \
     0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503 \
     0x86bCF0841622a5dAC14A313a15f96A95421b9366 \

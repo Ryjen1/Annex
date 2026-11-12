@@ -138,7 +138,7 @@ verification, and seeding scripts are ready for `DeployAnnex.s.sol` / `SeedMarke
 |------|------|
 | Live app | https://annex-markets.vercel.app (landing) · https://annex-markets.vercel.app/markets (markets) · `/trove` (in-app Trove funding) |
 | Wave 1 Contract (legacy) | `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` — https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d |
-| Wave 2 Contract (pending live broadcast + Blockscout verify) | Update with deployed Wave 2 `AnnexMarket` explorer link right after `DeployAnnex.s.sol` + `forge verify-contract` |
+| Wave 2 Contract (Mezo Testnet, Blockscout verified) | `0x3b760389E795a191219e86edD8bef498B31c680d` — https://explorer.test.mezo.org/address/0x3b760389E795a191219e86edD8bef498B31c680d |
 | Public repo | https://github.com/Ryjen1/Annex |
 | Deck | [`assets/deck.pdf`](../assets/deck.pdf) (8 slides, PDF) · source: [`assets/deck.html`](../assets/deck.html) |
 | Video | Wave 1 pitch (`assets/video/annex-pitch.mp4`, 78 s) — update with unlisted YouTube Wave 2 walkthrough per `docs/demo-script.md` |
@@ -199,21 +199,21 @@ integrated Mezo DeFi application (Level 3+):
 - **65 Foundry tests + verified Mezo fork lifecycle:** All 51 Wave 1 tests (including the 4 AMM
   quote-vs-price regression tests) plus 14 new Wave 2 unit/fuzz tests (`AnnexMarketWave2.t.sol`)
   and `SmokeTestWave2.s.sol` / `DeployAnnex.s.sol` / `SeedMarkets.s.sol`.
-- **Submission & explorer readiness:** Blockscout verification command ready against
-  `https://explorer.test.mezo.org/api/`, Wave 2 pitch deck & demo script updated, and full
+- **Submission & explorer readiness:** `AnnexMarket` verified directly on Blockscout via
+  `https://api.explorer.test.mezo.org/api/`, Wave 2 pitch deck & demo script updated, and full
   AKINDO Overview copy written to replace `#ERROR!`.
 
-## Real-user testing evidence (Wave 2 — populate after live testnet broadcast)
+## Real-user & live protocol testing evidence (Wave 2 — Mezo Testnet)
 
-> Do **not** count deployer-only seeding transactions as external users. Once Wave 2 is
-> broadcast to Mezo Testnet, invite non-deployer wallets to open/top up a Trove via `/trove`,
-> trade on a `PriceFeed` and `Manual` market, and settle/redeem — then paste their explorer
-> hashes below before submitting on AKINDO.
+> Executed live against verified Wave 2 `AnnexMarket` (`0x3b760389E795a191219e86edD8bef498B31c680d`)
+> using dedicated non-deployer user wallets alongside deployer Trove/market operations:
 
-| Wallet (non-deployer) | Action tested (Trove / Buy / Settle / Redeem) | Tx hash / Explorer link |
+| Wallet | Action tested on Mezo Testnet (`chainId 31611`) | Explorer tx link |
 |---|---|---|
-| `<user-wallet-1>` | `<e.g. openTrove + buyShares YES on PriceFeed #0>` | `<explorer.test.mezo.org/tx/...>` |
-| `<user-wallet-2>` | `<e.g. buyShares NO on Manual #2>` | `<explorer.test.mezo.org/tx/...>` |
+| Deployer `0x7a0df48a9ae9DA978Be21538F0F9F74182915a49` | `openTrove` + `addColl` + `withdrawMUSD` (2,440 MUSD) via `BorrowerOperations` | [openTrove](https://explorer.test.mezo.org/tx/0x3369c92a5a3e5f0ef5d2399393282ad866b4cf4ec949cb05608ace3d73bd9fb3) · [addColl](https://explorer.test.mezo.org/tx/0x6277d5f7de432392981c4abae94b17cbc786159972b935b1dc009ac6e769c5d1) · [withdrawMUSD](https://explorer.test.mezo.org/tx/0x421cfc45b480ce207ddfafa66d619a17ce3f94914f638124f510829645e5909e) |
+| Non-deployer `user1` (`0x222dCAfe7bfba7Da1207BA2F3CDD7e4B42F9B672`) | `buyShares(YES, 50 MUSD)` on PriceFeed Market #0 (`BTC >= $75k`), `buyShares` + `redeem` on #6 & #7 | [buy #0](https://explorer.test.mezo.org/tx/0x9c73eaaecfe948a0fec81fdaed98c1178436e09d37a21f6307427a62a14fad65) · [redeem #6](https://explorer.test.mezo.org/tx/0x7ea33ddbf50515b4d76f96ce0dfa8df52037f7ac8ad8fb74f313c0f7055cb036) · [redeem #7](https://explorer.test.mezo.org/tx/0x79a2e340b97ed5d50ed3c307b03d0c643f9102f8ab7201cf4bfb9b1b0b05dbbe) |
+| Non-deployer `user2` (`0x18faF506D79982A23C155D6ED8277051e68617a3`) | `buyShares(NO, 40 MUSD)` on PriceFeed #1, `buyShares(YES, 30 MUSD)` on Manual #2, permissionless `resolvePriceMarket(#7)` | [buy #1](https://explorer.test.mezo.org/tx/0x899bc694570afc898a5575e1d10518ab0d844433dc7179637a976fbc5f7dc976) · [buy #2](https://explorer.test.mezo.org/tx/0x80c1b7dabe42694a8b8f47a72a7b79e0b6c849d757ba70b8e9bfd71c65485bbf) · [resolvePriceMarket #7](https://explorer.test.mezo.org/tx/0x716154f125d1daeaba7cb531a42c05a9b960e9f2c009550baabefd20a8a7c43d) |
+| Deployer `0x7a0df48a9ae9DA978Be21538F0F9F74182915a49` | `claimLp` on #6 & #7 + `claimFees` (`0.48 MUSD`, leaving `totalLockedCollateral == MUSD.balanceOf == 2,269.64 MUSD`) | [claimFees](https://explorer.test.mezo.org/tx/0xc4c54497a0428276e98df63ff2d9e6eb5e06746b8acda779159fb54c59082359) |
 
 ## Future milestones
 
@@ -240,8 +240,8 @@ integrated Mezo DeFi application (Level 3+):
 - [x] AKINDO Overview & Wave 2 copy ready (fixes `#ERROR!` product overview)
 - [x] Idle-pool yield safety assessment documented (`README.md` + `docs/architecture.md`)
 - [x] 65 Foundry tests + frontend `build` / `lint` passing
-- [ ] Wave 2 `AnnexMarket` deployed to Mezo Testnet, seeded (`SeedMarkets.s.sol`), and **verified on Blockscout explorer**
-- [ ] Frontend env updated (`VITE_ANNEX_ADDRESS`) and redeployed to Vercel
-- [ ] Non-deployer user wallets executed testnet trades (hashes recorded above)
+- [x] Wave 2 `AnnexMarket` deployed to Mezo Testnet (`0x3b760389E795a191219e86edD8bef498B31c680d`), seeded (8 markets), and **verified on Blockscout explorer**
+- [ ] Frontend Vercel env (`VITE_ANNEX_ADDRESS=0x3b760389E795a191219e86edD8bef498B31c680d`) verified & redeployed (`contracts.ts` fallback updated)
+- [x] Non-deployer user wallets executed testnet trades, settlement & fee claim (hashes recorded above)
 - [ ] Wave 2 2-minute pitch video recorded (`docs/demo-script.md`) & uploaded (YouTube unlisted)
 - [ ] Team info + AKINDO form fields pasted & submitted

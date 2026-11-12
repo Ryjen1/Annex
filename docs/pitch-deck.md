@@ -100,22 +100,22 @@ totalLockedCollateral        ==  totalYes  ==  totalNo
 
 | Piece | Status |
 |---|---|
-| `AnnexMarket.sol` Wave 2 (`PriceFeed`, `TroveManager`, `30 bps` fee) | Done — audited & tested |
-| In-app Trove funding (`BorrowerOperations` + `HintHelpers` + `SortedTroves`) | Done — `/trove` + inline drawers |
+| `AnnexMarket.sol` Wave 2 (`PriceFeed`, `TroveManager`, `30 bps` fee) | Live & Blockscout verified |
+| In-app Trove funding (`BorrowerOperations` + `HintHelpers` + `SortedTroves`) | Done — `/trove` + 2,440 MUSD live Trove |
 | Foundry suite (`AnnexMarket.t.sol` + `AnnexMarketWave2.t.sol`) | Done — 65 / 65 passing |
-| Mezo Testnet fork E2E + deploy/seed/Blockscout verify scripts | Done — ready for broadcast |
+| Live Mezo Testnet rollout (`SeedMarkets`, non-deployer trades, `claimFees`) | Done — 8 markets (#0–#5 open, #6–#7 settled) |
 | Frontend (`Vite` + `React 18` + `Tailwind` + `Passport`) + Wave 2 docs/deck | Done — 0 lint/type warnings |
 
-`Chain: Mezo Testnet (31611) · Wave 1 legacy: 0xfdbfde0a…5a501d · Settlement: MUSD · Gas: BTC`
+`Chain: Mezo Testnet (31611) · Wave 2: 0x3b760389…31c680d (verified) · Settlement: MUSD · Gas: BTC`
 
 ---
 
 ## 8 — Roadmap
 
-- **Wave 2 Shipped (Now):** In-app Mezo Trove funding (L3+), BTC/USD `PriceFeed` settlement,
-  isolated `0.30%` fee, StabilityPool deferral proof, 65 tests.
-- **Wave 2 Launch (Next):** Broadcast Wave 2 contract on Mezo Testnet, Blockscout explorer
-  verification, live Vercel update, external trader transactions, Wave 2 walkthrough video.
+- **Wave 2 Shipped (Now):** Live Blockscout-verified Wave 2 contract (`0x3b760389…31c680d`),
+  in-app Troves (L3+), BTC/USD `PriceFeed` settlement, `0.30%` isolated fee, multi-user txs.
+- **Submission Finalization (Today):** Verify Vercel `VITE_ANNEX_ADDRESS` env, attach
+  2-minute Wave 2 walkthrough video, and submit AKINDO overview + team fields.
 - **Mainnet & Beyond:** Atomic `sMUSD` idle-collateral yield once live on Mezo, transferable
   ERC-20 LP positions, per-market OHLC/activity charts, multi-outcome Bitcoin macro pools.
 

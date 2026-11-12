@@ -36,7 +36,7 @@ ANNEX_ADDRESS=0x... forge script script/SeedMarkets.s.sol --rpc-url $RPC_URL --p
 export RPC_URL=https://rpc.test.mezo.org
 forge script script/DeployAnnex.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 forge verify-contract <ADDRESS> src/AnnexMarket.sol:AnnexMarket \
-  --verifier blockscout --verifier-url https://explorer.test.mezo.org/api/ \
+  --verifier blockscout --verifier-url https://api.explorer.test.mezo.org/api/ \
   --constructor-args $(cast abi-encode "constructor(address,address,address,uint256)" \
     0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503 \
     0x86bCF0841622a5dAC14A313a15f96A95421b9366 \

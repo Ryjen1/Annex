@@ -17,7 +17,7 @@ Wave 2 connects Mezo's core CDP and oracle primitives directly into both the sma
 2. Two clearly separated market types: Objective BTC/USD threshold markets (`createPriceMarket`, e.g. "BTC >= $95,000 at expiry") settle permissionlessly after `endTime` using Mezo's canonical `PriceFeed.fetchPrice()` (`resolvePriceMarket`), with manual overrides blocked on-chain. Subjective/event markets keep `MarketKind.Manual` resolver settlement (`resolve`).
 3. Constant-product AMM with isolated revenue: `buyShares` charges a disclosed 0.30% (`30 bps`) protocol entry fee into `accruedFees`, splits the remaining MUSD into YES + NO shares across `reserveYes * reserveNo = k`, and guarantees 1:1 MUSD redemptions (`0%` exit fee) for winners while LPs claim the remaining pool surplus.
 
-All 65 Foundry tests (unit, fuzz, reentrancy, Wave 1 regression + Wave 2 PriceFeed/fee/Trove tests) and production frontend checks pass, and the Wave 2 build is verified end-to-end against a fork of Mezo Testnet alongside legacy Wave 1 contract `0xfdbfde0a430de94c1d862cfc290c36549b5a501d`.
+All 65 Foundry tests (unit, fuzz, reentrancy, Wave 1 regression + Wave 2 PriceFeed/fee/Trove tests) and production frontend checks pass, and the Wave 2 `AnnexMarket` contract is deployed and verified on Mezo Testnet at `0x3b760389E795a191219e86edD8bef498B31c680d` (`https://explorer.test.mezo.org/address/0x3b760389E795a191219e86edD8bef498B31c680d`) alongside legacy Wave 1 contract `0xfdbfde0a430de94c1d862cfc290c36549b5a501d` — with a live 2,440 MUSD Trove, 8 seeded/tested markets, non-deployer trades, permissionless `resolvePriceMarket`, 1:1 redemptions, and `0.48 MUSD` `claimFees` verified on-chain.
 
 ==============================================================================
 THE PROBLEM IT SOLVES
@@ -41,7 +41,7 @@ CHALLENGES I RAN INTO
 ==============================================================================
 TECHNOLOGIES I USED
 ==============================================================================
-Contracts: Solidity 0.8.28 (EVM `london`, optimizer 200 runs, via-ir), Foundry + forge-std (65 tests: 51 Wave 1 + 14 Wave 2 unit/fuzz/invariant), Blockscout verification (`explorer.test.mezo.org`), integrated directly with canonical Mezo MUSD (`0x1189...Ac503`), `PriceFeed` (`0x86bC...b9366`), and `TroveManager` (`0xE47c...6bb0`).
+Contracts: Solidity 0.8.28 (EVM `london`, optimizer 200 runs, via-ir), Foundry + forge-std (65 tests: 51 Wave 1 + 14 Wave 2 unit/fuzz/invariant), Blockscout-verified Wave 2 `AnnexMarket` (`0x3b760389E795a191219e86edD8bef498B31c680d` on `explorer.test.mezo.org`), integrated directly with canonical Mezo MUSD (`0x1189...Ac503`), `PriceFeed` (`0x86bC...b9366`), and `TroveManager` (`0xE47c...6bb0`).
 
 Frontend: React 18, TypeScript, Vite 8, Tailwind CSS v4, wagmi v2 + viem, @mezo-org/passport (RainbowKit), @tanstack/react-query multicalls, vite-plugin-node-polyfills, plus direct ABIs for Mezo `BorrowerOperations` (`0xCdF7...4beE5`), `HintHelpers` (`0x4e4c...BCF6`), and `SortedTroves` (`0x722E...68fA`).
 
@@ -62,4 +62,4 @@ WHAT WE LEARNED
 1. Composability means meeting the other protocol's exact state machine: integrating `BorrowerOperations` revealed `maxBorrowingCapacity` persistence across `addColl`/`refinance()` and O(N) hint sensitivity in `SortedTroves` — details you only catch by testing against the live chain contracts.
 2. Pricing and accounting invariants are the real UX: entry-fee isolation (`totalLockedCollateral` vs `accruedFees`) keeps every YES/NO share redeemable at an exact 1.00 MUSD par while giving the protocol clean revenue.
 3. Saying "no" to unsafe yield is an engineering deliverable: proving from `StabilityPool.sol` bytecode why parking prediction collateral there can block withdrawals saved user solvency from silent liquidation risk.
-4. Keeping objective PriceFeed markets and subjective resolver markets structurally separate eliminates ambiguity for both traders and automated settlement bots.
+4. Keeping objective PriceFeed markets and subjective resolver markets structurally separate eliminates ambiguity for both traders and automated settlement bots. 

@@ -15,8 +15,8 @@ strictly 1:1 for MUSD.
   - `BorrowerOperations`: [`0xCdF7028ceAB81fA0C6971208e83fa7872994beE5`](https://explorer.test.mezo.org/address/0xCdF7028ceAB81fA0C6971208e83fa7872994beE5) *(note: earlier Wave 1 notes contained a typo `96beE5`, which has no bytecode on testnet; `94beE5` is the live contract)*
   - `TroveManager`: [`0xE47c80e8c23f6B4A1aE41c34837a0599D5D16bb0`](https://explorer.test.mezo.org/address/0xE47c80e8c23f6B4A1aE41c34837a0599D5D16bb0)
   - `PriceFeed`: [`0x86bCF0841622a5dAC14A313a15f96A95421b9366`](https://explorer.test.mezo.org/address/0x86bCF0841622a5dAC14A313a15f96A95421b9366)
+- **Wave 2 Contract (Mezo Testnet, Blockscout verified):** [`0x3b760389E795a191219e86edD8bef498B31c680d`](https://explorer.test.mezo.org/address/0x3b760389E795a191219e86edD8bef498B31c680d) (`FEE_BPS=30`, deployed & verified)
 - **Wave 1 Contract (legacy v1):** [`0xfdbfde0a430de94c1d862cfc290c36549b5a501d`](https://explorer.test.mezo.org/address/0xfdbfde0a430de94c1d862cfc290c36549b5a501d)
-- **Wave 2 Contract:** deploy with [`contracts/script/DeployAnnex.s.sol`](contracts/script/DeployAnnex.s.sol) (`FEE_BPS=30`) and verify on Blockscout (command below)
 - **Live app:** https://annex-markets.vercel.app
 - **Repo:** https://github.com/Ryjen1/Annex
 - **Docs:** [`docs/architecture.md`](docs/architecture.md) · [`docs/pitch-deck.md`](docs/pitch-deck.md) · [`docs/submission.md`](docs/submission.md) · [`docs/demo-script.md`](docs/demo-script.md)
@@ -109,7 +109,7 @@ forge script script/DeployAnnex.s.sol \
   --broadcast \
   --verify \
   --verifier blockscout \
-  --verifier-url https://explorer.test.mezo.org/api/
+  --verifier-url https://api.explorer.test.mezo.org/api/
 
 ANNEX_ADDRESS=0x... forge script script/SeedMarkets.s.sol \
   --rpc-url $RPC_URL \
@@ -122,7 +122,7 @@ To verify an already-deployed contract directly on Blockscout:
 forge verify-contract <ANNEX_ADDRESS> src/AnnexMarket.sol:AnnexMarket \
   --chain 31611 \
   --verifier blockscout \
-  --verifier-url https://explorer.test.mezo.org/api/ \
+  --verifier-url https://api.explorer.test.mezo.org/api/ \
   --constructor-args $(cast abi-encode "constructor(address,address,address,uint256)" \
     0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503 \
     0x86bCF0841622a5dAC14A313a15f96A95421b9366 \
