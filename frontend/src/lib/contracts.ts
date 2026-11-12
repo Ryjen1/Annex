@@ -8,7 +8,7 @@
  *   VITE_MUSD_ADDRESS=0x...    settlement token (defaults to canonical Mezo Testnet MUSD)
  */
 export const ANNEX_ADDRESS = (import.meta.env.VITE_ANNEX_ADDRESS ??
-  '0x0000000000000000000000000000000000000000') as `0x${string}`
+  '0x3b760389E795a191219e86edD8bef498B31c680d') as `0x${string}`
 
 export const MUSD_ADDRESS = (import.meta.env.VITE_MUSD_ADDRESS ??
   '0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503') as `0x${string}`
